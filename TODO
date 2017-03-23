@@ -12,6 +12,8 @@ NEXT RELEASE
 Finish watch alerts
 toggle for cwas
 goes16 plugin
+yarn cant install on linux - fix issue with fsevents? check in dist files?
+npm install chokes on webpack-dev-server extract on linux
 
 
 NEED SOON FEATURES
