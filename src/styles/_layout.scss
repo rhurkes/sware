@@ -1,0 +1,27 @@
+$tablet-width: 768px;
+$desktop-width: 1024px;
+$desktop-landscape-width: 1280px;
+
+@mixin tablet {
+  @media (min-width: #{$tablet-width}) and (max-width: #{$desktop-width - 1px}) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: #{$desktop-width}) {
+    @content;
+  }
+}
+
+@mixin desktop-landscape {
+    @media (min-width: #{$desktop-landscape-width}) {
+        @content;
+    }
+}
+
+@mixin not-desktop-landscape {
+  @media (max-width: #{$desktop-landscape-width - 1}) {
+    @content;
+  }
+}

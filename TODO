@@ -1,0 +1,69 @@
+BUGS
+Audio not firing ended event for ogg file
+Delay when navigating to page with lots of stuff (home > events) - when is this noticeable on desktop? on mobile? find safe value, load that many on route change, then load the rest
+IEM sometimes sends data out of order? Need to watch. Could pro-actively sort
+
+
+NOTES
+event details.important and alerts decoration happens only on initial load, so changing filters doesn't affect it
+
+
+NEXT RELEASE
+Finish watch alerts
+toggle for cwas
+goes16 plugin
+
+
+NEED SOON FEATURES
+clean up iemHelper
+early barf if key features not supported: geolocation/localStorage (anything else?)
+show filter changes in events list and on startup
+show active CWAs in parent subtext
+reset to default config
+wth is going on in store.ts
+test alert scenarios and sounds that are emitted
+assess hide continues/expires messages
+add home config
+hook up home active data
+handle flood of LSR and continue/expires
+add snackbar for messages - assess where it should be used (try/catch is good first run)
+no events, configure feed (can display snackbar)
+add up arrow for when you're scrolled down in a list
+add new notification for when you're scrolled down in a list
+show network break in events lines
+add reset for network stats
+
+
+NICE TO HAVES
+better looking select controls
+display event source in iframe off to side in desktop mode
+get text API feed for current weather to use on home page
+user-config voices
+
+PLUGINS
+SPC Mesoanalysis
+CoD GOES 16
+CIMSS
+
+
+PRODUCTION OPTIMIZATION
+remove tacking on of message to li element for events
+
+
+BEST PRACTICES
+add unit test coverage tracking
+hit 100% test coverage
+remove scheduling from middleware, put in app lifecycle
+remove as many instances of 'any' type as possible
+incorporate immutable (or ramda)
+vendor vs sware code bundles
+need favicon
+getting messy passing props from app -> chrome -> whatever
+implement error handling strategy
+no empty catches
+do I need react-tap-plugin for fast clicking?
+use pure functions over react classes when possible - assess all components
+split up large ducks
+manually check to see if all variables/imports are used
+really think about how data should flow through the whole app, including iya processing
+absolute before relative imports

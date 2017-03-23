@@ -1,0 +1,30 @@
+{
+  "include": [ "src/**/*" ],
+  "exclude": [
+    ".coverage",
+    ".nyc_output",
+    ".vscode",
+    "dist",
+    "node_modules",
+    "test_data",
+    "src/*",
+    "src/app.tsx",
+    "src/entry.ts",
+    "src/assets/**/*",
+    "src/config/**/*",
+    "src/styles/**/*",
+    "src/**/*.test.(ts|tsx|js|jsx)"
+  ],
+  "extension": [ ".tsx", ".ts" ],
+  "require": [ "./preMocha.js" ],
+  "silent": false,
+  "cache": true,
+  "check-coverage": true,
+  "lines": 0,
+  "statements": 0,
+  "functions": 0,
+  "branches": 0,
+  "reporter": [ "lcov", "text-summary", "html" ],
+  "report-dir": "./.coverage",
+  "all": true
+}

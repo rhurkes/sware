@@ -1,0 +1,25 @@
+@import 'colors';
+
+li.menulist-item.parent {
+  cursor: pointer;
+
+  .menu-expand {
+    padding: 0 16px;
+  }
+}
+
+li.menulist-item.child {
+  padding-left: 16px;
+}
+
+li.menulist-item {
+  display: flex;
+  justify-content: space-between;
+  height: 64px;
+  border-bottom: 1px solid $gray;
+  align-items: center;
+
+  .subtext {
+    font-size: 10px;
+  }
+}
