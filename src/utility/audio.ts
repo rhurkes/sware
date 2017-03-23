@@ -9,9 +9,9 @@ export const AudioType = {
 };
 
 export const Sound = {
-  EAS: '/assets/audio/eas.mp3',
-  Chime: '/assets/audio/chime.mp3',
-  Bamboo: '/assets/audio/bamboo.mp3',
+  EAS: 'assets/audio/eas.mp3',
+  Chime: 'assets/audio/chime.mp3',
+  Bamboo: 'assets/audio/bamboo.mp3',
 };
 
 const audioElement = document.createElement('audio');
@@ -36,6 +36,7 @@ function processQueue(): void {
   if (queueItem.type === AudioType.Sound) {
     audioElement.src = queueItem.soundPath;
     audioElement.onended = queueCleanup;
+    audioElement.onerror = queueCleanup;
     audioElement.play();
   } else if (queueItem.type === AudioType.Speech) {
     const { utterances } = queueItem;

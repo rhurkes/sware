@@ -2,8 +2,6 @@ BUGS
 Audio not firing ended event for ogg file
 Delay when navigating to page with lots of stuff (home > events) - when is this noticeable on desktop? on mobile? find safe value, load that many on route change, then load the rest
 IEM sometimes sends data out of order? Need to watch. Could pro-actively sort
-yarn cant install on linux - fix issue with fsevents? check in dist files?
-npm install chokes on webpack-dev-server extract on linux
 
 
 NOTES
@@ -12,9 +10,26 @@ temporarily checking in dist files to get around linux build issues
 
 
 NEXT RELEASE
-Finish watch alerts
-toggle for cwas
+CRITICAL BUG: displays multiple bulletins
+CRITICAL BUG: audio files not coming in: https://sigtor.org/assets/audio/bamboo.mp3
+BUG: always show weather images on home screen side by side
+finish watch alerts
+show filtered count and timestamp for new events if all events are filterd
+toggle for not filtering by cwa
+display all cwas currently being filtered
+add subtext for events config age and hail size alerts
+hook up home active data
+
+
+NEXT EPIC
 goes16 plugin
+
+
+INFRASTRUCTURE
+Setup cert renewal
+yarn cant install on linux - fix issue with fsevents? check in dist files?
+npm install chokes on webpack-dev-server extract on linux
+streamline deployment process
 
 
 BACKLOG
@@ -22,36 +37,28 @@ condense fire outlook messages: PTS/FDL: "The Storm Prediction Center issues Day
 clean up iemHelper
 early barf if key features not supported: geolocation/localStorage (anything else?)
 show filter changes in events list and on startup
-show active CWAs in parent subtext
 reset to default config
-wth is going on in store.ts
 test alert scenarios and sounds that are emitted
 assess hide continues/expires messages
 add home config
-hook up home active data
 handle flood of LSR and continue/expires
 add snackbar for messages - assess where it should be used (try/catch is good first run)
-no events, configure feed (can display snackbar)
 add up arrow for when you're scrolled down in a list
 add new notification for when you're scrolled down in a list
 show network break in events lines
 add reset for network stats
-
-
-NICE TO HAVES
 better looking select controls
 display event source in iframe off to side in desktop mode
 get text API feed for current weather to use on home page
 user-config voices
 
-PLUGINS
+BACKLOG PLUGINS
 SPC Mesoanalysis
-CoD GOES 16
 CIMSS
 
 
 PRODUCTION OPTIMIZATION
-remove tacking on of message to li element for events
+
 
 
 BEST PRACTICES

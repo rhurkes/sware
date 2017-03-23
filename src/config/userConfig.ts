@@ -60,7 +60,7 @@ const eventsConfig = {
 const sortedCWAs = Object.keys(cwas).sort((a, b) => cwas[a].st.localeCompare(cwas[b].st));
 sortedCWAs.forEach((cwa) => {
   eventsConfig.cwas.children[cwa] = {
-    value: false,
+    value: true,
     __text: cwa.toUpperCase(),
     __subtext: `${cwas[cwa].name}, ${cwas[cwa].st}`,
   };
