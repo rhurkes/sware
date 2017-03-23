@@ -2,18 +2,19 @@ BUGS
 Audio not firing ended event for ogg file
 Delay when navigating to page with lots of stuff (home > events) - when is this noticeable on desktop? on mobile? find safe value, load that many on route change, then load the rest
 IEM sometimes sends data out of order? Need to watch. Could pro-actively sort
+yarn cant install on linux - fix issue with fsevents? check in dist files?
+npm install chokes on webpack-dev-server extract on linux
 
 
 NOTES
 event details.important and alerts decoration happens only on initial load, so changing filters doesn't affect it
+temporarily checking in dist files to get around linux build issues
 
 
 NEXT RELEASE
 Finish watch alerts
 toggle for cwas
 goes16 plugin
-yarn cant install on linux - fix issue with fsevents? check in dist files?
-npm install chokes on webpack-dev-server extract on linux
 
 
 NEED SOON FEATURES
