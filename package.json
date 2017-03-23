@@ -4,7 +4,7 @@
   "private": true,
   "license": "SEE LICENSE IN <TODO>",
   "scripts": {
-    "build": "npm run clean && NODE_ENV=production webpack",
+    "build": "npm run clean && npm run copy-assets && NODE_ENV=production webpack",
     "clean": "rm -rf ./dist",
     "copy-assets": ". ./build_scripts/copy_assets.sh",
     "dev": "npm run clean && npm run copy-assets && NODE_ENV=development webpack-dev-server",

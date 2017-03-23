@@ -17,7 +17,8 @@ toggle for cwas
 goes16 plugin
 
 
-NEED SOON FEATURES
+BACKLOG
+condense fire outlook messages: PTS/FDL: "The Storm Prediction Center issues Day 1 Fire Outlook", "The Storm Prediction Center issues Day 1 Fire Critical Risk for portions of DDC's area"
 clean up iemHelper
 early barf if key features not supported: geolocation/localStorage (anything else?)
 show filter changes in events list and on startup

@@ -22,7 +22,7 @@ export default {
   apx: { name: 'Gaylord', st: 'MI' },
   grr: { name: 'Grand Rapids', st: 'MI' },
   mqt: { name: 'Marquette', st: 'MI' },
-  dlt: { name: 'Duluth', st: 'MN' },
+  dlh: { name: 'Duluth', st: 'MN' },
   mpx: { name: 'Minneapolis/Twin Cities', st: 'MN' },
   eax: { name: 'Kansas City/Pleasant Hill', st: 'MO' },
   sgf: { name: 'Springfield', st: 'MO' },
