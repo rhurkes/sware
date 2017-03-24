@@ -7,9 +7,9 @@
   padding: 8px 0; }
   #events li.important {
     color: #fff; }
-  #events li.tor .line-icon {
+  #events li.tor .line-icon, #events li.tornado-watch .line-icon {
     background-color: #ef2929; }
-  #events li.svr .line-icon {
+  #events li.svr .line-icon, #events li.severe-watch .line-icon {
     background-color: #cdcd00; }
   #events li.tornado-emergency .line-icon {
     background-color: magenta; }

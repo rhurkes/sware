@@ -42,6 +42,7 @@ const localStorageUserConfigKey = 'userConfig';
 function decorateConfig(config, parentPath = '') {
   const decoratedConfig = Object.assign({}, config);
 
+  // TODO this thing is really, really broken
   Object.keys(decoratedConfig).forEach((key) => {
     const configItem = decoratedConfig[key];
     const valueType = typeof configItem;
@@ -62,6 +63,12 @@ function saveUserConfig(userConfig) {
   localStorage.setItem(localStorageUserConfigKey, serializedUserConfig);
 }
 
+// TODO implement this
+function resetToDefaultConfig() {
+  localStorage.clear();
+  return defaultUserConfig;
+}
+
 // TODO write unit tests for this!
 // 1. can't find localstorage item
 // 2. error while parsing
@@ -76,10 +83,14 @@ function getSavedUserConfig() {
     return defaultUserConfig;
   }
 
+  // TODO TESTING
+  console.log('og', defaultUserConfig);
+  console.log('decorated', decorateConfig(defaultUserConfig));
+
   try {
     const savedConfig = JSON.parse(serializedConfig);
-    const mergeFunc = (k, l, r) => r;
-    const mergedConfig = R.mergeWithKey(mergeFunc, defaultUserConfig, savedConfig);
+    const mergeFunc = (l, r) => typeof r !== 'undefined' ? r : l;
+    const mergedConfig = R.mergeWith(mergeFunc, defaultUserConfig, savedConfig);
     return mergedConfig;
   } catch(ex) {
     console.error('Unable to merge saved and default user configs', ex);
@@ -92,4 +103,5 @@ export default {
   decorateConfig,
   getSavedUserConfig,
   saveUserConfig,
+  resetToDefaultConfig,
 };

@@ -10,8 +10,8 @@ const NetworkComponent = (props: INetworkComponentProps) => {
 
   return (
     <ol>
-      <li>Min/avg/max: {`${min}/${avg}/${max}`}</li>
-      <li>Count: {count}</li>
+      <li>Latency (ms): {`${min} min / ${avg} avg / ${max} max`}</li>
+      <li>Requests: {count}</li>
       <li>Errors: {errors} ({errorPercent.toFixed(0)}%)</li>
     </ol>
   );

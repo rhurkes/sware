@@ -11,10 +11,19 @@ function fireFirstAlert() {
   }
 }
 
+// TODO put these all into a single function
 function hailWarningRule(evt, store?) {
   if (evt.details.code === NWSProduct.LocalStormReport && evt.details.alertTextValues) {
     fireFirstAlert();
     audio.speak(evt.details.alertTextValues);
+  }
+}
+
+function torWatchRule(evt, store?) {
+  if (evt.details.metaCode === metaCode.TornadoWatch) {
+    fireFirstAlert();
+    audio.playSound(Sound.EAS);
+    audio.speak(['Storm Prediction Center issues Tornado Watch']);
   }
 }
 
@@ -53,7 +62,8 @@ function spcOutlookRule(evt, store?) {
   }
 }
 
-const eventsRules = [spcOutlookRule, mdRule, torEmergencyRule, torReportRule, torWarningRule, hailWarningRule];
+const eventsRules = [spcOutlookRule, mdRule, torEmergencyRule, torReportRule, torWarningRule,
+  hailWarningRule, torWatchRule];
 
 function processEventsRules(events, store) {
   eventsRules.forEach(rule => {

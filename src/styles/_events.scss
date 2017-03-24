@@ -12,11 +12,11 @@
     }
 
     // Tornado
-    &.tor .line-icon {
+    &.tor .line-icon, &.tornado-watch .line-icon {
       background-color: $red-color;
     }
     // Severe
-    &.svr .line-icon {
+    &.svr .line-icon, &.severe-watch .line-icon {
       background-color: $normal-yellow-color;
     }
     // Tornado Emergency

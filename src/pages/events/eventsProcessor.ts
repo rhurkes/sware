@@ -39,8 +39,6 @@ function truncateOldEvents(events, condensedEventsLength, eventLimit) {
 }
 
 export function processIncomingEvents(incomingEvents: IIEMMessageData[], state: any, eventLimit: number) {  
-  const lastIEMSequence = incomingEvents[incomingEvents.length - 1].seqnum || 0;
-
   const formattedEvents = incomingEvents
     .map(iemHelper.formatMessage)
     .filter(x => x) // Remove null results from formatter
@@ -55,7 +53,6 @@ export function processIncomingEvents(incomingEvents: IIEMMessageData[], state: 
     events: condensedEvents.concat(truncatedOldEvents),
     filteredEvents: filteredNewEvents.concat(filteredOldEvents),
     filteredNewEvents,
-    lastIEMSequence,
   };
 }
 

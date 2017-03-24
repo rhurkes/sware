@@ -82,20 +82,6 @@ describe('eventsProcessor', () => {
   describe('processIncomingEvents', () => {
     const defaultEventLimit = 10;
 
-    it('should return lastIEMSequence from last event passed in', () => {
-      const lastSeqnum = 1000;
-      const incomingEvents = [
-        { message: '', product_id: '', ts: '', seqnum: 0 },
-        { message: '', product_id: '', ts: '', seqnum: lastSeqnum },
-      ] as IIEMMessageData[];
-      const state = {
-        events: [],
-        eventsUserConfig: defaultConfig,
-      };
-      const result = eventsProcessor.processIncomingEvents(incomingEvents, state, defaultEventLimit);
-      result.lastIEMSequence.should.be.equal(lastSeqnum);
-    });
-
     it('should call formatMessage for each incoming message', () => {
       const incomingEvents = [
         { message: '', product_id: '', ts: '', seqnum: 0 },

@@ -4,7 +4,7 @@
 const eventsConfig = {
   DATA_URL: 'https://weather.im/iembot-json/room/botstalk?seqnum={seq}',
   POLLING_INTERVAL_MS: 60 * 1000,
-  EVENT_LIMIT: 250,
+  EVENT_LIMIT: 40,
   UPDATE_TIMEAGO_INTERVAL_MS: 60 * 1000,
   SEVERE_MODE_PRODUCTS: ['afd', 'ffa', 'ffs', 'ffw', 'flw', 'ftm', 'lsr', 'swo', 'pwo', 'sps', 'svr', 'svs', 'tor', 'wou', 'wwp', 'pts'],
 };
@@ -13,7 +13,7 @@ const appConfig = {
   FULLSCREEN_MODE: false,
   APP_LOG_ENTRY_LIMIT: 500,
   NETWORK_LOG_ENTRY_LIMIT: 500,
-  DEVELOPMENT_MODE: false,
+  DEVELOPMENT_MODE: true,
 };
 
 const homeConfig = {
@@ -31,7 +31,6 @@ const audioConfig = {
 
 const speechConfig = {
   ENABLED: true,
-  VOICE: 'Victoria',
   PLAY_INTRO: false,
 };
 

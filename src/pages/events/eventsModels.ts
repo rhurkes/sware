@@ -5,6 +5,7 @@ export interface WxEvent {
   timeLabel: string;
   tsUTC: string;
   coords?: any;
+  seqnum: number;
   details: {
     code: string;
     metaCode?: string;

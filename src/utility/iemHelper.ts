@@ -1,6 +1,5 @@
 import * as moment from 'moment';
 import { clone } from 'ramda';
-import userConfig from '../config/userConfig';
 import datetimeHelper from './datetimeHelper';
 import textHelper from './textHelper';
 import { WxEvent } from '../pages/events/eventsModels';
@@ -13,7 +12,8 @@ export const NWSProduct = {
   SevereWeatherStatement: 'svs' as 'svs',
   TornadoWarning: 'tor' as 'tor',
   SevereLocalStormWatch: 'sls' as 'sls',
-}
+  WeatherWatchClearanceNotification: 'wcn' as 'wcn',
+};
 
 const regexPatterns = {
   LSRTorReport: /(\[.+?\]) (.+?) reports TORNADO/,
@@ -21,11 +21,12 @@ const regexPatterns = {
 };
 
 export const metaCode = {
-  TornadoEmergency: 'tornado_emergency' as 'tornado_emergency',
-  MesoscaleDiscussion: 'mesoscale_discussion' as 'mesoscale_discussion',
-  TornadoReport: 'tornado_report' as 'tornado_report',
-  HailReport: 'hail_report' as 'hail_report',
-  Watch: 'watch' as 'watch',
+  TornadoEmergency: 'tornado-emergency' as 'tornado-emergency',
+  MesoscaleDiscussion: 'mesoscale-discussion' as 'mesoscale-discussion',
+  TornadoReport: 'tornado-report' as 'tornado-report',
+  HailReport: 'hail-report' as 'hail-report',
+  TornadoWatch: 'tornado-watch' as 'tornado-watch',
+  SevereThunderstormWatch: 'severe-watch' as 'severe-watch',
 }
 
 export const convectiveRisk = {
@@ -141,10 +142,11 @@ function addMetaCodes(details) {
       if (matches.length > 4) {
         if (matchPattern === regexPatterns.LSRHailReport) {
           const magnitude = parseFloat(matches[4]);
+          /* TODO need to figure out where to check alerts
           if (magnitude >= userConfig.events.alerts.children.hailSize.value) {
             details.alertTextValues = [textValues[0], textValues[1].replace('reports', `reports ${magnitude} inch`)];
             details.important = true;
-          }
+          }*/
         }
       } else {
         details.alertTextValues = textValues;
@@ -156,42 +158,52 @@ function addMetaCodes(details) {
 
   const lsrTorMatch = 'reports TORNADO';
   const lsrHailMatch = 'reports HAIL';
+  /* TODO need to figure out where to check alerts
   const shouldCheckLSRs = userConfig.events.alerts.children.hailSize.value > 0 &&
-    userConfig.events.alerts.children.tornadoReports.value;
+    userConfig.events.alerts.children.tornadoReports.value;*/
+  const shouldCheckLSRs = true;
 
-  // Check LSR for alert meta codes
-  if (details.code === NWSProduct.LocalStormReport && shouldCheckLSRs) {
-    if (details.text.indexOf(lsrTorMatch) > -1) {
-      details = decorateLSRAlert(details, regexPatterns.LSRTorReport);
-      details.important = true;
-      details.metaCode = metaCode.TornadoReport;
-    } else if (details.text.indexOf(lsrHailMatch) > -1) {
-      details.metaCode = metaCode.HailReport;
-      details = decorateLSRAlert(details, regexPatterns.LSRHailReport);
+  switch (details.code) {
+    case NWSProduct.LocalStormReport: {
+      if (!shouldCheckLSRs) { break; }
+      if (details.text.indexOf(lsrTorMatch) > -1) {
+        details = decorateLSRAlert(details, regexPatterns.LSRTorReport);
+        details.important = true;
+        details.metaCode = metaCode.TornadoReport;
+      } else if (details.text.indexOf(lsrHailMatch) > -1) {
+        details.metaCode = metaCode.HailReport;
+        details = decorateLSRAlert(details, regexPatterns.LSRHailReport);
+      }
+      break;
     }
-  }
-
-  if (details.code === NWSProduct.TornadoWarning) {
-    details.important = true;
-  }
-
-  // Check TOR and SVS for tor emergency wording to append special meta code
-  if ([NWSProduct.TornadoWarning, NWSProduct.SevereWeatherStatement].includes(details.code) &&
-    tornadoEmergencyRegex.test(details.text)) {
-      details.metaCode = metaCode.TornadoEmergency;
+    case NWSProduct.TornadoWarning: {
       details.important = true;
-  }
-
-  // Handle MDs
-  if (details.code === NWSProduct.SevereStormOutlookNarrative && details.wfo === 'mcd') {
-    details.metaCode = metaCode.MesoscaleDiscussion;
-    details.important = true;
-  }
-
-  // Handle Watches
-  if (details.code === NWSProduct.SevereLocalStormWatch && userConfig.events.alerts.children.watches.value) {
-    details.metaCode = metaCode.Watch;
-    details.important = true;
+      // fall through to SVS to check for tor emergency
+    }
+    case NWSProduct.SevereWeatherStatement: {
+      if (tornadoEmergencyRegex.test(details.text)) {
+        details.metaCode = metaCode.TornadoEmergency;
+        details.important = true;
+      }
+      break;
+    }
+    case NWSProduct.SevereStormOutlookNarrative: {
+      if (details.wfo !== 'mcd') { break; }
+      details.metaCode = metaCode.MesoscaleDiscussion;
+      details.important = true;
+      break;
+    }
+    case NWSProduct.WeatherWatchClearanceNotification: {
+      if (details.text.indexOf('issues Tornado Watch') > -1) {
+        details.metaCode = metaCode.TornadoWatch;
+        details.important = true;
+      } else if (details.text.indexOf('issues Severe Thunderstorm Watch') > -1) {
+        details.metaCode = metaCode.SevereThunderstormWatch;
+        details.important = true;
+      }
+      break;
+    }
+    default: break;
   }
 
   return details;
@@ -216,7 +228,7 @@ function formatMessage(data: IIEMMessageData): WxEvent {
 
   // TODO this big try catch is a temporary defensive measure to ensure nothing breaks
   try {
-    const { message, product_id, ts } = data;
+    const { message, product_id, ts, seqnum } = data;
     const tsUTC = `${ts.replace(' ', 'T')}Z`;
     let details: any = {};
 
@@ -249,6 +261,7 @@ function formatMessage(data: IIEMMessageData): WxEvent {
       details,
       source,
       tsUTC,
+      seqnum, // TODO temporarily here to help identify dupes
       time: new Date(tsUTC).getTime(),
       timeAgo: datetimeHelper.getTimeAgo(tsUTC),
       timeLabel: `${moment(tsUTC).format('HH:mm')}Z`,

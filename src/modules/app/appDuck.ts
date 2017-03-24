@@ -11,6 +11,7 @@ export const getGeolocation = state => state[moduleName].geolocation;
 export const getNetworkStats = state => state[moduleName].networkStats;
 export const getAudioQueue = state => state[moduleName].audioQueue;
 export const getUserConfig = state => state[moduleName].userConfig;
+// export const getActiveData = state => 
 
 // Action creators
 export const triggerIyaProcessing = (events: any) => ({ type: actions.TRIGGER_IYA_PROCESSING, events });

@@ -14,10 +14,8 @@ const LineComponent = (props: ILineComponentProps) => {
   const lineIcon = (<div className="line-icon ">{code}</div>);
   let classes = code;
 
-  if (details.metaCode === metaCode.TornadoEmergency) {
-    classes = classes.concat(' tornado-emergency');
-  } else if (details.metaCode === metaCode.MesoscaleDiscussion) {
-    classes = classes.concat(' mesoscale-discussion');
+  if (details.metaCode) {
+    classes = classes.concat(` ${details.metaCode}`);
   }
 
   if (details.important) {

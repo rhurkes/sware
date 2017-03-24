@@ -7,6 +7,8 @@ import userConfig from '../../config/userConfig';
 import configHelper from '../../config/configHelper';
 import objectHelper from '../../utility/objectHelper';
 import eventProcessor from './eventsProcessor';
+import * as R from 'ramda';
+import audio, { AudioType, Sound } from '../../utility/audio';
 
 export const moduleName = 'events';
 
@@ -80,8 +82,25 @@ export const reducer = (state = initialState, action: any) => {
         return state;
       }
 
-      const { events, filteredEvents, filteredNewEvents, lastIEMSequence }
+      const lastIEMSequence = action.data.messages[action.data.messages.length - 1].seqnum;
+      const { events, filteredEvents, filteredNewEvents }
         = eventProcessor.processIncomingEvents(action.data.messages, state, swareConfig.events.EVENT_LIMIT);
+
+      // TODO remove this junk for dupe testing
+      const eventSeqnums = events.map(x => x.seqnum);
+      const filteredEventSeqnums = filteredEvents.map(x => x.seqnum);
+      const uniqueEvents = R.uniq(eventSeqnums);
+      const uniqueFilteredEventSeqnums = R.uniq(filteredEventSeqnums);
+      if (eventSeqnums.length !== uniqueEvents.length) {
+        console.error('duplicate events', events);
+        audio.speak(['duplicate events']);
+      }
+      if (filteredEventSeqnums.length !== uniqueFilteredEventSeqnums.length) {
+        console.error('duplicate FilteredEvents', events);
+        audio.speak(['duplicate FilteredEvents']);
+      }
+      console.log(`current events: ${state.events.length}, next events: ${events.length}`)
+      // TODO remove this junk for dupe testing
 
       return {
         ...state,

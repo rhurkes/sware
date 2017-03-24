@@ -24,13 +24,14 @@ class EventsComponent extends React.Component<IEventsComponentProps, {}> {
   eventsTimer;
 
   componentDidMount() {
-    const { fetching, fetchEvents, lastIEMSequence, updateEventsTimeAgo } = this.props;
+    const { fetching, fetchEvents, lastIEMSequence, updateEventsTimeAgo, pollingTimer } = this.props;
 
     this.eventsTimer = setInterval(() => {
       updateEventsTimeAgo();
     }, swareConfig.events.UPDATE_TIMEAGO_INTERVAL_MS);
 
-    if (fetching) {
+    // pollingTimer check is important to prevent this from firing every time you change routes
+    if (fetching && !pollingTimer) {
       fetchEvents(lastIEMSequence);
     }
   }
@@ -62,7 +63,6 @@ class EventsComponent extends React.Component<IEventsComponentProps, {}> {
   }
 
   componentWillUnount() {
-    clearTimeout(this.props.pollingTimer);
     clearInterval(this.eventsTimer);
   }
 

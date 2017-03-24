@@ -1,7 +1,7 @@
 BUGS
 Audio not firing ended event for ogg file
 Delay when navigating to page with lots of stuff (home > events) - when is this noticeable on desktop? on mobile? find safe value, load that many on route change, then load the rest
-IEM sometimes sends data out of order? Need to watch. Could pro-actively sort
+If you don't open events, it doesn't fetch data
 
 
 NOTES
@@ -10,15 +10,27 @@ temporarily checking in dist files to get around linux build issues
 
 
 NEXT RELEASE
-CRITICAL BUG: displays multiple bulletins
-CRITICAL BUG: audio files not coming in: https://sigtor.org/assets/audio/bamboo.mp3
+[x] CRITICAL BUG: displays multiple bulletins - caused by calling fetchEvents every time the component was remounted
+CRITICAL BUG: saved 5 cwas, load default with all cwas - app shows all bulletins, but config shows only 5 selected. Investigate this use case.
+[x] Watches are now bolded, color-coded, and can be alerts
+[x] Labels updated on home screen for network
+[x] Active data section hidden for now since it isn't implemented
+BUG: Where should I do the alert logic? It's currently checked in iemHelper, but feels like it should be in iyaMiddleware. Then we might have cyclic deps, though.
+BUG: reset to default config - should configs be in single place, or just where needed. should just be where needed.
+TECH STORY: script to quickly deploy
+
+
+NEXT, NEXT RELEASE
+Maybe SPC watches *do* come through? I should log out all the products that come through with no product_id
 BUG: always show weather images on home screen side by side
-finish watch alerts
-show filtered count and timestamp for new events if all events are filterd
-toggle for not filtering by cwa
+BUG: spc canceled watches show as blank line
 display all cwas currently being filtered
-add subtext for events config age and hail size alerts
+react/redux should use production builds insted of development builds
+toggle for not filtering by cwa
+show filtered count and timestamp for new events if all events are filterd
+BUG: subtext/subtextfunc getting blown away when merging user/default config - its missing by the time you get to AppComponent. The problem seems to be some combination of decorateConfig and eventsDuck setting config in initial state.
 hook up home active data
+make full li clickable in nav menu
 
 
 NEXT EPIC
@@ -29,15 +41,16 @@ INFRASTRUCTURE
 Setup cert renewal
 yarn cant install on linux - fix issue with fsevents? check in dist files?
 npm install chokes on webpack-dev-server extract on linux
-streamline deployment process
+how to send state and any errors back to me?
 
 
 BACKLOG
+some sort of touch feedback for config controls
+BUG: touching controls is laggy - do I need react-tap-plugin for fast clicking? fastclick?
 condense fire outlook messages: PTS/FDL: "The Storm Prediction Center issues Day 1 Fire Outlook", "The Storm Prediction Center issues Day 1 Fire Critical Risk for portions of DDC's area"
 clean up iemHelper
 early barf if key features not supported: geolocation/localStorage (anything else?)
 show filter changes in events list and on startup
-reset to default config
 test alert scenarios and sounds that are emitted
 assess hide continues/expires messages
 add home config
@@ -51,6 +64,7 @@ better looking select controls
 display event source in iframe off to side in desktop mode
 get text API feed for current weather to use on home page
 user-config voices
+process audio/speech when tab not active?
 
 BACKLOG PLUGINS
 SPC Mesoanalysis
@@ -72,7 +86,6 @@ need favicon
 getting messy passing props from app -> chrome -> whatever
 implement error handling strategy
 no empty catches
-do I need react-tap-plugin for fast clicking?
 use pure functions over react classes when possible - assess all components
 split up large ducks
 manually check to see if all variables/imports are used

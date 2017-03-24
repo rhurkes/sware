@@ -4,6 +4,9 @@ import {
   IFetchAPIAction,
   INetworkStat,
 } from '../middleware/fetchMiddlewareModel';
+import fake from '../../test_data/iem-double-md';
+
+const useFakeData = false;
 
 /**
  * Fetches data from an API
@@ -19,6 +22,16 @@ const fetchAPI = (store: any) => (next: any) => (action: IFetchAPIAction): void 
 
   if (!action.meta || !action.meta.url) { return next(action); }
   const { url, isJSONP, moduleName, polling } = action.meta;
+
+  if (useFakeData) {
+    store.dispatch({
+      type: actions.FETCH_SUCCESS,
+      moduleName,
+      data: fake,
+      networkStat: buildNetworkStat(StatusCodeOK, 100),
+    });
+    return;
+  }
 
   if (isJSONP) {
     fetchJSONP(url)

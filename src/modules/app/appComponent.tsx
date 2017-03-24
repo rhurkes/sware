@@ -42,10 +42,6 @@ export default class App extends React.Component<any, undefined> {
     Object.keys(timers).forEach(key => clearTimeout(timers[key]));
   }
 
-  passConfigsToModule() {
-
-  }
-
   getGeolocation() {
     geolocation.getCurrentLocation()
       .then((data: Coordinates) => {
