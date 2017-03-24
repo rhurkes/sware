@@ -6,7 +6,7 @@ import { equals } from 'ramda';
 import { IFetchAPIAction } from '../../middleware/fetchMiddlewareModel';
 
 interface IEventsComponentProps {
-  eventsUserConfig: any;
+  userConfig: any;
   fetching: boolean;
   filteredEvents: WxEvent[];
   filteredNewEvents: WxEvent[];
@@ -43,9 +43,11 @@ class EventsComponent extends React.Component<IEventsComponentProps, {}> {
   }
 
   shouldComponentUpdate(prevProps, nextState) {
+    /* We'll assume we always want to render on new props, except the scenario where the
+      new props are events, and the events require filtering. This prevents events from
+      being rendered, then filtered, and then potentially disappearing in the re-render. */
     if (prevProps.requiresFilterEvents) {
       this.props.triggerFilterEvents(this.props.filteredEvents);
-
       return false;
     }
 
@@ -67,12 +69,13 @@ class EventsComponent extends React.Component<IEventsComponentProps, {}> {
   }
 
   render() {
-    const { location, filteredEvents, eventsUserConfig } = this.props;
+    const { location, filteredEvents, userConfig } = this.props;
     const children: any = this.props.children;
     const configPathname = '/events/config';
-    const childrenWithConfig = children
-      ? React.cloneElement(children, { eventsUserConfig })
-      : null;
+    // TODO can I replace this?
+    /*const childrenWithConfig = children
+      ? React.cloneElement(children, { userConfig })
+      : null;*/
     let eventsList;
 
     // Only render events if not on the config
@@ -86,7 +89,7 @@ class EventsComponent extends React.Component<IEventsComponentProps, {}> {
 
     return (
       <div className="page">
-        {childrenWithConfig}
+        {children}
         {eventsList}
       </div>
     );

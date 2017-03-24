@@ -13,6 +13,7 @@ export const NWSProduct = {
   TornadoWarning: 'tor' as 'tor',
   SevereLocalStormWatch: 'sls' as 'sls',
   WeatherWatchClearanceNotification: 'wcn' as 'wcn',
+  FireWeatherPointForecastMatrices: 'pfw' as 'pfw',
 };
 
 const regexPatterns = {
@@ -129,7 +130,7 @@ function getProductFromProductID(productID: string): any {
 
 // TODO all this meta code/alert stuff really should be broken out into a separate module
 // TODO should split this into separate functions for each thing
-function addMetaCodes(details) {
+function addMetaCodes(details, userConfig) {
   function decorateLSRAlert(details: any, matchPattern: RegExp): string[] {
     const regex = new RegExp(matchPattern);
     const matches = details.text.match(regex);
@@ -142,11 +143,10 @@ function addMetaCodes(details) {
       if (matches.length > 4) {
         if (matchPattern === regexPatterns.LSRHailReport) {
           const magnitude = parseFloat(matches[4]);
-          /* TODO need to figure out where to check alerts
-          if (magnitude >= userConfig.events.alerts.children.hailSize.value) {
+          if (magnitude >= userConfig.alerts.children.hailSize.value) {
             details.alertTextValues = [textValues[0], textValues[1].replace('reports', `reports ${magnitude} inch`)];
             details.important = true;
-          }*/
+          }
         }
       } else {
         details.alertTextValues = textValues;
@@ -158,10 +158,8 @@ function addMetaCodes(details) {
 
   const lsrTorMatch = 'reports TORNADO';
   const lsrHailMatch = 'reports HAIL';
-  /* TODO need to figure out where to check alerts
-  const shouldCheckLSRs = userConfig.events.alerts.children.hailSize.value > 0 &&
-    userConfig.events.alerts.children.tornadoReports.value;*/
-  const shouldCheckLSRs = true;
+  const shouldCheckLSRs = userConfig.alerts.children.hailSize.value > 0 &&
+    userConfig.alerts.children.tornadoReports.value;
 
   switch (details.code) {
     case NWSProduct.LocalStormReport: {
@@ -223,7 +221,7 @@ function getDetails(productID: string, message: string): any {
   return details;
 }
 
-function formatMessage(data: IIEMMessageData): WxEvent {
+function formatMessage(data: IIEMMessageData, userConfig: any): WxEvent {
   if (!data || !data.message || !data.ts) { return null; }
 
   // TODO this big try catch is a temporary defensive measure to ensure nothing breaks
@@ -237,6 +235,7 @@ function formatMessage(data: IIEMMessageData): WxEvent {
       if (message.indexOf('Climate Report') > -1) { return null; } // Ignore climate reports
       if (message.indexOf('issues SIGMET') > -1) { return null; } // Ignore issues SIGMET
       if (message.indexOf('Space Weather Prediction Center') > -1) { return null; } // Ignore SWPC messages
+      if (message.indexOf('The Storm Prediction Center issues Day 1 Fire') > -1) { return null; } // Ignore PWF messages
 
       // ASOS reports have extra whitespace and sometimes have status messages so we need a regex
       if (/ASOS.+reports/.test(message)) { return null; }
@@ -254,7 +253,7 @@ function formatMessage(data: IIEMMessageData): WxEvent {
         .trim();
 
       details.link = parsedHTML.link;
-      details = addMetaCodes(details);
+      details = addMetaCodes(details, userConfig);
     }
 
     return {

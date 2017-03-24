@@ -1,4 +1,14 @@
+import * as R from 'ramda';
+
 const delimiter = '|';
+
+function deepMerge(a, b) {
+  return R.isArrayLike(b) && !R.is(Object, b[0])
+    ? b
+    : (R.is(Object, a) && R.is(Object, b))
+      ? R.mergeWith(deepMerge, a, b)
+      : b;
+}
 
 function getReference(target: any, path: string) {
   let reference = target;
@@ -29,4 +39,5 @@ function setFromPath(target: any, key: string, path: string, value: string | num
 export default {
   getFromPath,
   setFromPath,
+  deepMerge,
 };

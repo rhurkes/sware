@@ -11,27 +11,29 @@ temporarily checking in dist files to get around linux build issues
 
 NEXT RELEASE
 [x] CRITICAL BUG: displays multiple bulletins - caused by calling fetchEvents every time the component was remounted
-CRITICAL BUG: saved 5 cwas, load default with all cwas - app shows all bulletins, but config shows only 5 selected. Investigate this use case.
+[X] CRITICAL BUG: saved 5 cwas, load default with all cwas - app shows all bulletins, but config shows only 5 selected.
+[x] CRITICAL TASK: configs need a re-write
+[X] BUG: subtext/subtextfunc getting blown away when merging user/default config
 [x] Watches are now bolded, color-coded, and can be alerts
 [x] Labels updated on home screen for network
 [x] Active data section hidden for now since it isn't implemented
-BUG: Where should I do the alert logic? It's currently checked in iemHelper, but feels like it should be in iyaMiddleware. Then we might have cyclic deps, though.
-BUG: reset to default config - should configs be in single place, or just where needed. should just be where needed.
-TECH STORY: script to quickly deploy
+[x] Filters out Day 1 Fire outlooks (PFW product)
+[x] toggle for showing all CWAs
+[x] display all cwas currently being filtered
 
 
 NEXT, NEXT RELEASE
+TECH STORY: script to quickly deploy
+FEATURE: reset to default config
 Maybe SPC watches *do* come through? I should log out all the products that come through with no product_id
 BUG: always show weather images on home screen side by side
 BUG: spc canceled watches show as blank line
-display all cwas currently being filtered
 react/redux should use production builds insted of development builds
-toggle for not filtering by cwa
+
 show filtered count and timestamp for new events if all events are filterd
-BUG: subtext/subtextfunc getting blown away when merging user/default config - its missing by the time you get to AppComponent. The problem seems to be some combination of decorateConfig and eventsDuck setting config in initial state.
 hook up home active data
 make full li clickable in nav menu
-
+BUG: Where should I do the alert logic? It's currently checked in iemHelper, but feels like it should be in iyaMiddleware. Then we might have cyclic deps, though.
 
 NEXT EPIC
 goes16 plugin
@@ -45,6 +47,7 @@ how to send state and any errors back to me?
 
 
 BACKLOG
+some sort of getter/setter for my config objects to make it easier and provide built in null handling
 some sort of touch feedback for config controls
 BUG: touching controls is laggy - do I need react-tap-plugin for fast clicking? fastclick?
 condense fire outlook messages: PTS/FDL: "The Storm Prediction Center issues Day 1 Fire Outlook", "The Storm Prediction Center issues Day 1 Fire Critical Risk for portions of DDC's area"

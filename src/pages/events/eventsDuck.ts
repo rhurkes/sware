@@ -3,14 +3,14 @@ import datetimeHelper from '../../utility/datetimeHelper';
 import { IFetchAPIAction } from '../../middleware/fetchMiddlewareModel';
 import { WxEvent } from './eventsModels';
 import actions from '../../actions';
-import userConfig from '../../config/userConfig';
 import configHelper from '../../config/configHelper';
 import objectHelper from '../../utility/objectHelper';
 import eventProcessor from './eventsProcessor';
 import * as R from 'ramda';
 import audio, { AudioType, Sound } from '../../utility/audio';
+import Modules from '../../pages/modules';
 
-export const moduleName = 'events';
+export const moduleName = Modules.Events;
 
 // Selectors
 export const getFilteredNewEvents = state => state[moduleName].filteredNewEvents;
@@ -18,30 +18,30 @@ export const getFilteredEvents = state => state[moduleName].filteredEvents;
 export const getLastIEMSequence = state => state[moduleName].lastIEMSequence;
 export const getPollingTimer = state => state[moduleName].pollingTimer;
 export const getRequiresFilterEvents = state => state[moduleName].requiresFilterEvents;
+export const getEventsUserConfig = state => state[moduleName].userConfig;
 
 // Action creators
-export const toggleFetching = () => ({ type: actions.TOGGLE_EVENTS_FETCHING });
-export const updateEventsTimeAgo = () =>  ({ type: actions.UPDATE_EVENTS_TIMEAGO });
-export const triggerFilterEvents = () => ({ type: actions.TRIGGER_FILTER_EVENTS });
+export const updateEventsTimeAgo = (eventsUserConfig) =>  ({ type: actions.UPDATE_EVENTS_TIMEAGO, eventsUserConfig });
+export const triggerFilterEvents = (eventsUserConfig) => ({ type: actions.TRIGGER_FILTER_EVENTS, eventsUserConfig });
 
-export const updateEventsUserConfig = (path: string, value, key: string = 'value') => ({
-  type: actions.UPDATE_USER_CONFIG, path: `${moduleName}|${path}`, value, key,
+export const updateUserConfig = (path: string, value, key: string = 'value') => ({
+  type: actions.UPDATE_EVENTS_USER_CONFIG, path, value, key,
 });
 
 export const fetchEvents = (lastIEMSequence: number): IFetchAPIAction => ({
   type: actions.FETCH_REQUEST,
   meta: {
-    url: swareConfig.events.DATA_URL.replace(/{seq}/, lastIEMSequence.toString()),
+    url: swareConfig[moduleName].DATA_URL.replace(/{seq}/, lastIEMSequence.toString()),
     isJSONP: true,
     analyze: true,
     moduleName,
     polling: {
-      delay: swareConfig.events.POLLING_INTERVAL_MS,
+      delay: swareConfig[moduleName].POLLING_INTERVAL_MS,
       timerActionType: actions.POLLING_TIMER_UPDATE,
-      continueCheck: store => store.getState()[moduleName].eventsUserConfig.fetching.value,
+      continueCheck: store => store.getState()[moduleName].userConfig.fetching.value,
       createNextAction: (store, action) => {
         const nextAction = Object.assign({}, action);
-        nextAction.meta.url = swareConfig.events.DATA_URL.replace(
+        nextAction.meta.url = swareConfig[moduleName].DATA_URL.replace(
           '{seq}', store.getState()[moduleName].lastIEMSequence);
 
         return nextAction;
@@ -52,8 +52,8 @@ export const fetchEvents = (lastIEMSequence: number): IFetchAPIAction => ({
 
 // Reducers
 const initialState = {
-  eventsUserConfig: configHelper.decorateConfig(userConfig.events),
   events: [],
+  userConfig: configHelper.getUserConfig(Modules.Events),
   requiresFilterEvents: false,
   filteredEvents: [],
   filteredNewEvents: [],
@@ -68,14 +68,6 @@ export const reducer = (state = initialState, action: any) => {
         ...state, pollingTimer: action.pollingTimer,
       };
     }
-    case actions.TOGGLE_EVENTS_FETCHING: {
-      return {
-        ...state,
-        fetching: !state.eventsUserConfig.fetching.value,
-        // Reset to 0 only when enabling fetching again to allow cancels to work
-        pollingTimer: !state.eventsUserConfig.fetching.value ? 0 : state.pollingTimer,
-      }
-    }
     case actions.FETCH_SUCCESS: {
       if (action.moduleName !== moduleName || !action.data ||
         !action.data.messages || !action.data.messages.length) {
@@ -83,42 +75,25 @@ export const reducer = (state = initialState, action: any) => {
       }
 
       const lastIEMSequence = action.data.messages[action.data.messages.length - 1].seqnum;
-      const { events, filteredEvents, filteredNewEvents }
-        = eventProcessor.processIncomingEvents(action.data.messages, state, swareConfig.events.EVENT_LIMIT);
-
-      // TODO remove this junk for dupe testing
-      const eventSeqnums = events.map(x => x.seqnum);
-      const filteredEventSeqnums = filteredEvents.map(x => x.seqnum);
-      const uniqueEvents = R.uniq(eventSeqnums);
-      const uniqueFilteredEventSeqnums = R.uniq(filteredEventSeqnums);
-      if (eventSeqnums.length !== uniqueEvents.length) {
-        console.error('duplicate events', events);
-        audio.speak(['duplicate events']);
-      }
-      if (filteredEventSeqnums.length !== uniqueFilteredEventSeqnums.length) {
-        console.error('duplicate FilteredEvents', events);
-        audio.speak(['duplicate FilteredEvents']);
-      }
-      console.log(`current events: ${state.events.length}, next events: ${events.length}`)
-      // TODO remove this junk for dupe testing
+      const { events, filteredEvents, filteredNewEvents } = eventProcessor.processIncomingEvents(
+        action.data.messages, state.events, state.userConfig, swareConfig[moduleName].EVENT_LIMIT);
 
       return {
         ...state,
         events, filteredEvents, filteredNewEvents, lastIEMSequence,
       };
     }
-    /*case actions.UPDATE_EVENTS_USER_CONFIG: {
-      const eventsUserConfig = objectHelper.setFromPath(
-        state.eventsUserConfig, action.key, action.path, action.value);
+    case actions.UPDATE_EVENTS_USER_CONFIG: {
+      const userConfig = objectHelper.setFromPath(state.userConfig, action.key, action.path, action.value);
+      configHelper.saveUserConfig(moduleName, userConfig);
       
-      // TODO make sure this logic remains
       // Updating the fetching status should not trigger a filter-only action
       const requiresFilterEvents = action.path !== 'fetching';
 
-      return { ...state, eventsUserConfig, requiresFilterEvents };
-    }*/
+      return { ...state, userConfig, requiresFilterEvents };
+    }
     case actions.UPDATE_EVENTS_TIMEAGO: {
-      if (state.events.length === 0) { return state; }
+      if (!state.events.length) { return state; }
 
       // TODO can probably move this to event processor
       const updatedEvents = state.events.map((x) => {
@@ -128,18 +103,16 @@ export const reducer = (state = initialState, action: any) => {
         return newEvent;
       });
 
-      const filteredEvents = eventProcessor.filterEvents(updatedEvents, state.eventsUserConfig);
+      const filteredEvents = eventProcessor.filterEvents(updatedEvents, state.userConfig);
 
       return { ...state, events: updatedEvents, filteredEvents };
     }
     case actions.TRIGGER_FILTER_EVENTS: {
       const events = state.events.slice();
-      const filteredEvents = eventProcessor.filterEvents(events, state.eventsUserConfig);
+      const filteredEvents = eventProcessor.filterEvents(events, state.userConfig);
 
       return { ...state, filteredEvents, requiresFilterEvents: false };
     }
-    default: {
-      return state;
-    }
+    default: return state;
   }
 };

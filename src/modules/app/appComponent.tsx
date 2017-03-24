@@ -74,12 +74,11 @@ export default class App extends React.Component<any, undefined> {
   render() {
     /* This component is for ubiquitous DOM logic and scheduling of async events only -
       rendered elements should appear in the Chrome component */
-    const { children, userConfig, location, routeMappings, sidebarOpen, toggleSidebarOpen } = this.props;
-    const childrenWithConfig = React.cloneElement(children, { userConfig });
+    const { children, location, routeMappings, sidebarOpen, toggleSidebarOpen } = this.props;
 
     return (
       <ChromeComponent
-        children={childrenWithConfig}
+        children={children}
         location={location}
         routeMappings={routeMappings}
         sidebarOpen={sidebarOpen}

@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import EventsComponent from './eventsComponent';
 import {
-  getFilteredEvents, toggleFetching, updateEventsTimeAgo, fetchEvents,
+  getFilteredEvents, updateEventsTimeAgo, fetchEvents, getEventsUserConfig,
   getLastIEMSequence, getPollingTimer, getRequiresFilterEvents, triggerFilterEvents,
   getFilteredNewEvents,
 } from './eventsDuck';
@@ -9,16 +9,18 @@ import { triggerIyaProcessing } from '../../modules/app/appDuck';
 
 const moduleName = 'events';
 
-// TODO mergeprops for ownProps things
-const mapStateToProps = (state: any, ownProps: any) => ({
-  eventsUserConfig: ownProps.userConfig[moduleName],
-  fetching: ownProps.userConfig[moduleName].fetching.value,
-  filteredEvents: getFilteredEvents(state),
-  filteredNewEvents: getFilteredNewEvents(state),
-  lastIEMSequence: getLastIEMSequence(state),
-  pollingTimer: getPollingTimer(state),
-  requiresFilterEvents: getRequiresFilterEvents(state),
-});
+const mapStateToProps = (state: any) => {
+  const userConfig = getEventsUserConfig(state);
+  return ({
+    userConfig,
+    fetching: userConfig.fetching.value,
+    filteredEvents: getFilteredEvents(state),
+    filteredNewEvents: getFilteredNewEvents(state),
+    lastIEMSequence: getLastIEMSequence(state),
+    pollingTimer: getPollingTimer(state),
+    requiresFilterEvents: getRequiresFilterEvents(state),
+  });
+};
 
 export default connect(
   mapStateToProps,

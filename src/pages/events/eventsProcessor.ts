@@ -9,18 +9,20 @@ function filterByTime(cutoffMinutes: number, events: WxEvent[]) {
     : events;
 }
 
-function filterEvents(events, config) {
+function filterEvents(events, userConfig) {
   // Filter by age first, since it can quickly filter many events before more complex filters
-  let filteredEvents = filterByTime(config.age.value, events);
+  let filteredEvents = filterByTime(userConfig.age.value, events);
 
   // CWA filter
-  filteredEvents = filteredEvents.filter((evt) => {
-    const cwaSetting = config.cwas.children[evt.details.wfo];
-    return !cwaSetting || cwaSetting.value;
-  });
+  if (!userConfig.showAllCWAs.value) {
+    filteredEvents = filteredEvents.filter((evt) => {
+      const cwaSetting = userConfig.cwas.children[evt.details.wfo];
+      return !cwaSetting || cwaSetting.value;
+    });
+  }
 
   // Product filter
-  if (config.severeMode.value) {
+  if (userConfig.severeMode.value) {
     filteredEvents = filteredEvents.filter(x =>
       swareConfig.events.SEVERE_MODE_PRODUCTS.includes(x.details.code));
   }
@@ -38,16 +40,16 @@ function truncateOldEvents(events, condensedEventsLength, eventLimit) {
   return events;
 }
 
-export function processIncomingEvents(incomingEvents: IIEMMessageData[], state: any, eventLimit: number) {  
+export function processIncomingEvents(incomingEvents: IIEMMessageData[], events: WxEvent[], userConfig: any, eventLimit: number) {  
   const formattedEvents = incomingEvents
-    .map(iemHelper.formatMessage)
+    .map(x => iemHelper.formatMessage(x, userConfig))
     .filter(x => x) // Remove null results from formatter
     .reverse(); // Ensure newest events first
 
   const condensedEvents = iemHelper.condenseSPCOutlooks(formattedEvents);
-  const filteredNewEvents = filterEvents(condensedEvents, state.eventsUserConfig);
-  const truncatedOldEvents = truncateOldEvents(state.events, condensedEvents.length, eventLimit);
-  const filteredOldEvents = filterEvents(truncatedOldEvents, state.eventsUserConfig);
+  const filteredNewEvents = filterEvents(condensedEvents, userConfig);
+  const truncatedOldEvents = truncateOldEvents(events, condensedEvents.length, eventLimit);
+  const filteredOldEvents = filterEvents(truncatedOldEvents, userConfig);
 
   return {
     events: condensedEvents.concat(truncatedOldEvents),

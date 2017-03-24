@@ -2,11 +2,9 @@
  * Logs all actions and states after they are dispatched.
  */
 const logger = store => next => action => {
-  if (action.type === 'sware/fetch/SUCCESS') {
-    console.log('dispatching', action);
-  }
+  console.log('dispatching', action);
   next(action);
-  console.log('next state', store.getState());
+  //console.log('next state', store.getState());
 };
 
 /**

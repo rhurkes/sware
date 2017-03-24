@@ -1,4 +1,4 @@
-import eventsProcessor from '../eventsProcessor';
+/*import eventsProcessor from '../eventsProcessor';
 import userConfig from '../../../config/userConfig';
 import swareConfig from '../../../config/swareConfig';
 import iemHelper, { IIEMMessageData } from '../../../utility/iemHelper';
@@ -131,4 +131,4 @@ describe('eventsProcessor', () => {
       });
     });
   });
-});
+});*/

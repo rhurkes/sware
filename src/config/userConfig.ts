@@ -1,8 +1,13 @@
 import cwas from '../mappings/cwas';
+import Modules from '../pages/modules';
+
+// TODO might need to break this up into separate files once we get more modules in play
+
+const appConfig = {};
 
 const eventsConfig = {
   fetching: {
-    value: true,
+    value: false,
     __order: 0,
   },
   severeMode: {
@@ -22,7 +27,7 @@ const eventsConfig = {
     __order: 3,
   },*/
   alerts: {
-    __order: 4,
+    __order: 3,
     children: {
       outlooks: {
         value: true,
@@ -49,9 +54,22 @@ const eventsConfig = {
       },
     }
   },
+  showAllCWAs: {
+    value: true,
+    __text: 'Show all CWAs',
+    __subtextfunc: (x, y) => {
+      return x
+        ? 'Showing: all'
+        : `Showing: ${Object.keys(y.cwas.children)
+            .filter(z => y.cwas.children[z].value)
+            .map(z => z.toUpperCase())
+            .join(', ')}`;
+    },
+    __order: 4,
+  },
   cwas: {
-    __text: 'CWA Filtering',
-    __order: 3,
+    __text: 'Filter by CWA',
+    __order: 5,
     children: {},
   },
 };
@@ -67,5 +85,6 @@ sortedCWAs.forEach((cwa) => {
 });
 
 export default {
-  events: eventsConfig,
+  [Modules.App]: appConfig,
+  [Modules.Events]: eventsConfig,
 };

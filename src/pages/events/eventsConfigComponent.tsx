@@ -4,14 +4,14 @@ import MenuList from '../../shared-components/menuList';
 
 interface IEventsConfigComponentProps {
   configHash: number;
-  eventsUserConfig: any;
-  updateEventsUserConfig: (path: string, value: string | number | boolean) => void;
+  userConfig: any;
+  updateUserConfig: (path: string, value: string | number | boolean) => void;
 }
 
-const EventsConfigComponent = (props: IEventsConfigComponentProps): JSX.Element => {
-  const { eventsUserConfig, updateEventsUserConfig } = props;
+const EventsConfigComponent = (props: any): JSX.Element => {
+  const { userConfig, updateUserConfig } = props;
 
-  return (<MenuList config={eventsUserConfig} updateConfig={updateEventsUserConfig} />);
+  return (<MenuList config={userConfig} updateConfig={updateUserConfig} />);
 };
 
 export default EventsConfigComponent;

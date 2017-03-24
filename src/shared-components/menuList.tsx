@@ -69,7 +69,7 @@ function buildMenuItems(config, updateConfig, isChild?: boolean) {
     if (__subtext) {
       subtext = (<div className="subtext">{__subtext}</div>);
     } else if (__subtextfunc) {
-      subtext = (<div className="subtext">{__subtextfunc(value)}</div>);
+      subtext = (<div className="subtext">{__subtextfunc(value, config)}</div>);
     }
 
     return (

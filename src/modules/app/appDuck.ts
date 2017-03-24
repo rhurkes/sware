@@ -2,6 +2,7 @@ import actions from '../../actions';
 import configHelper from '../../config/configHelper';
 import objectHelper from '../../utility/objectHelper';
 import { rebuildNetworkStats } from '../../middleware/fetchMiddlewareModel';
+import Modules from '../../pages/modules';
 
 export const moduleName = 'app';
 
@@ -24,12 +25,11 @@ export const updateGeolocation = (geolocation: Coordinates) => ({
   geolocation
 });
 
-// State and reducers
 const initialState = {
   sidebarOpen: false,
   audioQueue: [],
   geolocation: {},
-  userConfig: configHelper.getSavedUserConfig(),
+  userConfig: configHelper.getUserConfig(Modules.App),
   networkStats: {
     min: 0,
     avg: 0,
@@ -43,15 +43,6 @@ const initialState = {
 
 export const reducer = (state = initialState, action: any) => {
   switch (action.type) {
-    case actions.UPDATE_USER_CONFIG: {
-      const newUserConfig = objectHelper.setFromPath(
-        state.userConfig, action.key, action.path, action.value);
-      configHelper.saveUserConfig(newUserConfig);
-
-      return {
-        ...state, userConfig: newUserConfig,
-      };
-    }
     case actions.TOGGLE_SIDEBAR_OPEN: {
       return {
         ...state, sidebarOpen: action.open,

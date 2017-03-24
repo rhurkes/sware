@@ -4,7 +4,7 @@ import {
   IFetchAPIAction,
   INetworkStat,
 } from '../middleware/fetchMiddlewareModel';
-import fake from '../../test_data/iem-double-md';
+import fake from '../../test_data/iem-hail-reports';
 
 const useFakeData = false;
 
