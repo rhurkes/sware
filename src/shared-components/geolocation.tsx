@@ -17,9 +17,14 @@ const Geolocation = (props: IGeolocationProps) => {
 
   return (
     <ol>
-      <li>Accuracy: {safeAccuracy}</li>
-      <li>Latitude: {safeLatitude}</li>
-      <li>Longitude: {safeLongitude}</li>
+      <li>
+        <div>Coords:</div>
+        <div>{safeLatitude}, {safeLongitude}</div>
+      </li>
+      <li>
+        <div>Accuracy:</div>
+        <div>{safeAccuracy}</div>
+      </li>
     </ol>
   );
 };

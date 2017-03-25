@@ -18,9 +18,8 @@ const getCurrentMinute = () => new Date(new Date().setMinutes(0)).getTime();
 class HomeComponent extends React.Component<IHomeComponentProps, { currentMinute: number }> {
   imageTimer;
 
-  // TODO should I have props here?
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = { currentMinute: getCurrentMinute() };
   }
 
@@ -41,10 +40,10 @@ class HomeComponent extends React.Component<IHomeComponentProps, { currentMinute
 
     return (
       <div className="page">
-        <Card title="Network">
+        <Card title="Network" className="stat-block">
           <NetworkComponent networkStats={networkStats} />
         </Card>
-        <Card title="Geolocation">
+        <Card title="Geolocation" className="stat-block">
           <Geolocation geolocation={geolocation}/>
         </Card>
         {/*<Card title="Active Data"></Card>*/}

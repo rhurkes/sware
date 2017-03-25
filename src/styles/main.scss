@@ -226,6 +226,17 @@ header {
     }
 }
 
+.stat-block {
+    ol {
+        width: 100%;
+    }
+    li {
+        display: flex;
+        justify-content: space-between;
+        padding: 0 16px;
+    }
+}
+
 .card {
     display: flex;
     align-items: center;

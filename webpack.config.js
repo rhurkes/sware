@@ -18,6 +18,9 @@ const config = {
       template: 'src/index.ejs'
     }),
     new ExtractTextPlugin('styles.css'),
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+    }),
   ],
   module: {
     rules: [{

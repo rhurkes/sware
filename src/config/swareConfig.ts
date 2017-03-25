@@ -7,15 +7,15 @@ const eventsConfig = {
   POLLING_INTERVAL_MS: 60 * 1000,
   EVENT_LIMIT: 250,
   UPDATE_TIMEAGO_INTERVAL_MS: 60 * 1000,
-  SEVERE_MODE_PRODUCTS: ['afd', 'ffa', 'ffs', 'ffw', 'flw', 'ftm', 'lsr', 'swo', 'pwo', 'sps', 'svr', 'svs', 'tor', 'wou', 'wwp', 'pts'],
+  SEVERE_MODE_PRODUCTS: ['afd', 'ffa', 'ffs', 'ffw', 'flw', 'ftm', 'lsr', 'swo', 'pwo', 'sps', 'svr', 'svs', 'tor', 'wou', 'wcn', 'wwp', 'pts'],
 };
 
 const appConfig = {
-  DEVELOPMENT_MODE: false,
+  DEVELOPMENT_MODE: true,
 };
 
 const homeConfig = {
-  HOME_IMAGE_REFRESH_MS: 120 * 1000,
+  HOME_IMAGE_REFRESH_MS: 3 * 60 * 1000,
 };
 
 const geolocationConfig = {
