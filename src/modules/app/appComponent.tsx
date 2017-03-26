@@ -54,7 +54,7 @@ export default class App extends React.Component<any, undefined> {
 
   handleKeydown(e) {
     // const { pathname } = this.props.location;
-    console.log(`keydown: ${e.which}`);
+    /*console.log(`keydown: ${e.which}`);
     switch (e.which) {
       case 219:
         // move preventdefault into move functions
@@ -66,9 +66,8 @@ export default class App extends React.Component<any, undefined> {
         //moveNextPage(pathname);
         break;
       }
-      default:
-        break;
-    }
+      default: break;
+    }*/
   }
 
   render() {

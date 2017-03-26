@@ -1,8 +1,10 @@
 import actions from '../actions';
 import audio, { AudioType, Sound } from '../utility/audio';
-import { metaCode, NWSProduct } from '../utility/iemHelper';
+import { metaCode } from '../utility/iemHelper';
+import NWSProducts from '../models/nwsProducts';
 
 let firstAlertFired;
+let firstEASAlertFired;
 
 function fireFirstAlert() {
   if (!firstAlertFired) {
@@ -11,9 +13,16 @@ function fireFirstAlert() {
   }
 }
 
+function fireEASAlert() {
+  if (!firstEASAlertFired) {
+    firstEASAlertFired = true;
+    audio.playSound(Sound.EAS);
+  }
+}
+
 // TODO put these all into a single function
 function hailWarningRule(evt, store?) {
-  if (evt.details.code === NWSProduct.LocalStormReport && evt.details.alertTextValues) {
+  if (evt.details.metaCode === metaCode.HailReport) {
     fireFirstAlert();
     audio.speak(evt.details.alertTextValues);
   }
@@ -21,14 +30,13 @@ function hailWarningRule(evt, store?) {
 
 function torWatchRule(evt, store?) {
   if (evt.details.metaCode === metaCode.TornadoWatch) {
-    fireFirstAlert();
-    audio.playSound(Sound.EAS);
+    fireEASAlert();
     audio.speak(['Storm Prediction Center issues Tornado Watch']);
   }
 }
 
 function torWarningRule(evt, store?) {
-  if (evt.details.code === NWSProduct.TornadoWarning) {
+  if (evt.details.code === NWSProducts.TornadoWarning) {
     fireFirstAlert();
     audio.speak([`${evt.details.wfo.toUpperCase()} issues tornado warning`]);
   }
@@ -50,13 +58,13 @@ function mdRule(evt, store?) {
 
 function torEmergencyRule(evt, store?) {
   if (evt.details.metaCode === metaCode.TornadoEmergency) {
-    audio.playSound(Sound.EAS);
+    fireEASAlert()
     audio.speak([evt.details.text]);
   }
 }
 
 function spcOutlookRule(evt, store?) {
-  if (evt.details.code === NWSProduct.ProbabilisticOutlookPoints) {
+  if (evt.details.code === NWSProducts.ProbabilisticOutlookPoints) {
     fireFirstAlert();
     audio.speak(evt.details.text.split(':'));
   }

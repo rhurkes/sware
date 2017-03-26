@@ -15,19 +15,20 @@ const eventsConfig = {
     __subtext: 'Only displays select products relevant to severe weather.',
     __order: 1,
   },
+  hideNonIssued: {
+    value: true,
+    __text: 'Hide Non-issued',
+    __subtext: 'Hides continues/expires/cancels events',
+    __order: 2,
+  },
   age: {
     value: 0,
     __subtextfunc: x => x === 0 ? 'Do not filter by age' : `Showing events from last ${x} minutes`,
     __options: [0, 15, 30, 45, 60, 90, 120, 180],
-    __order: 2,
+    __order: 3,
   },
-  /*issuedWarningsOnly: {
-    value: false,
-    __subtext: 'Hides continues/expires/extends/updates.',
-    __order: 3,
-  },*/
   alerts: {
-    __order: 3,
+    __order: 4,
     children: {
       outlooks: {
         value: true,
@@ -59,17 +60,17 @@ const eventsConfig = {
     __text: 'Show all CWAs',
     __subtextfunc: (x, y) => {
       return x
-        ? 'Showing: all'
+        ? ''
         : `Showing: ${Object.keys(y.cwas.children)
             .filter(z => y.cwas.children[z].value)
             .map(z => z.toUpperCase())
             .join(', ')}`;
     },
-    __order: 4,
+    __order: 5,
   },
   cwas: {
     __text: 'Filter by CWA',
-    __order: 5,
+    __order: 6,
     children: {},
   },
 };

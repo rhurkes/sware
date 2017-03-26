@@ -3,22 +3,11 @@ import { clone } from 'ramda';
 import datetimeHelper from './datetimeHelper';
 import textHelper from './textHelper';
 import { WxEvent } from '../pages/events/eventsModels';
-
-// TODO product code strongly typed map in separate file
-export const NWSProduct = {
-  LocalStormReport: 'lsr' as 'lsr',
-  ProbabilisticOutlookPoints: 'pts' as 'pts',
-  SevereStormOutlookNarrative: 'swo' as 'swo',
-  SevereWeatherStatement: 'svs' as 'svs',
-  TornadoWarning: 'tor' as 'tor',
-  SevereLocalStormWatch: 'sls' as 'sls',
-  WeatherWatchClearanceNotification: 'wcn' as 'wcn',
-  FireWeatherPointForecastMatrices: 'pfw' as 'pfw',
-};
+import NWSProducts from '../models/nwsProducts';
 
 const regexPatterns = {
-  LSRTorReport: /(\[.+?\]) (.+?) reports TORNADO/,
-  LSRHailReport: /(\[.+\]) (.+) (reports HAIL).+\([E|M](.+) INCH\)/,
+  LSRTorReport: /(\[.+?\]) (.+?) (reports TORNADO) at (.+? ...?) (.+)/i,
+  LSRHailReport: /(\[.+\]) (.+?) (reports HAIL).+\([E|M](.+) INCH\)/i,
 };
 
 export const metaCode = {
@@ -131,26 +120,45 @@ function getProductFromProductID(productID: string): any {
 // TODO all this meta code/alert stuff really should be broken out into a separate module
 // TODO should split this into separate functions for each thing
 function addMetaCodes(details, userConfig) {
-  function decorateLSRAlert(details: any, matchPattern: RegExp): string[] {
-    const regex = new RegExp(matchPattern);
+  function decorateTornadoLSRAlert(details: any): string[] {
+    const regex = new RegExp(regexPatterns.LSRTorReport);
     const matches = details.text.match(regex);
-    if (matches && matches.length > 2) {
-      const textValues = [
-        textHelper.getLocationSpeech(matches[1]),
-        textHelper.getTextSpeech(matches[2].concat(' ', matches[3]).toLowerCase()),
-      ];
+    if (matches && matches.length === 6) {
+      const firstText = `${textHelper.getLocationSpeech(matches[1])}, ${textHelper.getTextSpeech(matches[2].concat(' ', matches[3]))},`;
+      const secondText = ` at ${matches[4]}`
+      const finalText = textHelper.breakUpText(matches[5]);
+      details.alertTextValues = [firstText, secondText].concat(finalText);
+      details.important = true;
+      details.metaCode = metaCode.TornadoReport;
+    }
 
-      if (matches.length > 4) {
-        if (matchPattern === regexPatterns.LSRHailReport) {
-          const magnitude = parseFloat(matches[4]);
-          if (magnitude >= userConfig.alerts.children.hailSize.value) {
-            details.alertTextValues = [textValues[0], textValues[1].replace('reports', `reports ${magnitude} inch`)];
-            details.important = true;
+    return details;
+  }
+
+  function decorateLSRAlert(details: any, matchPattern: RegExp): string[] {
+    try {
+      const regex = new RegExp(matchPattern);
+      const matches = details.text.match(regex);
+      if (matches && matches.length > 2) {
+        const textValues = [
+          textHelper.getLocationSpeech(matches[1]),
+          textHelper.getTextSpeech(matches[2].concat(' ', matches[3]).toLowerCase()),
+        ];
+
+        if (matches.length > 4) {
+          if (matchPattern === regexPatterns.LSRHailReport) {
+            const magnitude = parseFloat(matches[4]);
+            if (magnitude >= userConfig.alerts.children.hailSize.value) {
+              details.alertTextValues = [textValues[0], textValues[1].replace('reports', `reports ${magnitude} inch`)];
+              details.important = true;
+            }
           }
+        } else {
+          details.alertTextValues = textValues;
         }
-      } else {
-        details.alertTextValues = textValues;
       }
+    } catch(ex) {
+      console.error(ex);
     }
 
     return details;
@@ -162,36 +170,34 @@ function addMetaCodes(details, userConfig) {
     userConfig.alerts.children.tornadoReports.value;
 
   switch (details.code) {
-    case NWSProduct.LocalStormReport: {
+    case NWSProducts.LocalStormReport: {
       if (!shouldCheckLSRs) { break; }
       if (details.text.indexOf(lsrTorMatch) > -1) {
-        details = decorateLSRAlert(details, regexPatterns.LSRTorReport);
-        details.important = true;
-        details.metaCode = metaCode.TornadoReport;
+        details = decorateTornadoLSRAlert(details);
       } else if (details.text.indexOf(lsrHailMatch) > -1) {
         details.metaCode = metaCode.HailReport;
         details = decorateLSRAlert(details, regexPatterns.LSRHailReport);
       }
       break;
     }
-    case NWSProduct.TornadoWarning: {
+    case NWSProducts.TornadoWarning: {
       details.important = true;
       // fall through to SVS to check for tor emergency
     }
-    case NWSProduct.SevereWeatherStatement: {
+    case NWSProducts.SevereWeatherStatement: {
       if (tornadoEmergencyRegex.test(details.text)) {
         details.metaCode = metaCode.TornadoEmergency;
         details.important = true;
       }
       break;
     }
-    case NWSProduct.SevereStormOutlookNarrative: {
+    case NWSProducts.SevereStormOutlookNarrative: {
       if (details.wfo !== 'mcd') { break; }
       details.metaCode = metaCode.MesoscaleDiscussion;
       details.important = true;
       break;
     }
-    case NWSProduct.WeatherWatchClearanceNotification: {
+    case NWSProducts.WeatherWatchClearanceNotification: {
       if (details.text.indexOf('issues Tornado Watch') > -1) {
         details.metaCode = metaCode.TornadoWatch;
         details.important = true;
@@ -224,11 +230,11 @@ function getDetails(productID: string, message: string): any {
 function formatMessage(data: IIEMMessageData, userConfig: any): WxEvent {
   if (!data || !data.message || !data.ts) { return null; }
 
-  // TODO this big try catch is a temporary defensive measure to ensure nothing breaks
   try {
     const { message, product_id, ts, seqnum } = data;
     const tsUTC = `${ts.replace(' ', 'T')}Z`;
     let details: any = {};
+    const parsedHTML = parseHTML(message);
 
     if (!product_id) {
       if (message.indexOf('pilot report') > -1) { return null; } // Ignore pilot reports
@@ -237,30 +243,34 @@ function formatMessage(data: IIEMMessageData, userConfig: any): WxEvent {
       if (message.indexOf('Space Weather Prediction Center') > -1) { return null; } // Ignore SWPC messages
       if (message.indexOf('The Storm Prediction Center issues Day 1 Fire') > -1) { return null; } // Ignore PWF messages
 
+      // Create a fake WCN
+      if (message.indexOf('SPC cancels WW') > -1) {
+        details.code = 'wcn';
+        details.wfo = '---';
+      }
+
       // ASOS reports have extra whitespace and sometimes have status messages so we need a regex
       if (/ASOS.+reports/.test(message)) { return null; }
     } else {
-      const parsedHTML = parseHTML(message);
       details = getDetails(product_id, message);
 
       // Details will be null for any hard filtered events like Summary LSRs - exit early
       if (details === null) { return null; }
+    }
 
-      details.text = parsedHTML.text
-        .replace(`(${details.code})`, '')
-        .replace(' (View text)', '')
-        .replace(' -- .', '')
-        .trim();
+    details.text = parsedHTML.text
+      .replace(`(${details.code})`, '')
+      .replace(' (View text)', '')
+      .replace(' -- .', '')
+      .trim();
 
       details.link = parsedHTML.link;
       details = addMetaCodes(details, userConfig);
-    }
 
     return {
       details,
       source,
       tsUTC,
-      seqnum, // TODO temporarily here to help identify dupes
       time: new Date(tsUTC).getTime(),
       timeAgo: datetimeHelper.getTimeAgo(tsUTC),
       timeLabel: `${moment(tsUTC).format('HH:mm')}Z`,

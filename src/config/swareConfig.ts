@@ -11,7 +11,7 @@ const eventsConfig = {
 };
 
 const appConfig = {
-  DEVELOPMENT_MODE: true,
+  DEVELOPMENT_MODE: false,
 };
 
 const homeConfig = {

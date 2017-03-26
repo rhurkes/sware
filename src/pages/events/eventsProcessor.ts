@@ -2,6 +2,8 @@ import iemHelper, { IIEMMessageData } from '../../utility/iemHelper';
 import { WxEvent } from './eventsModels';
 import swareConfig from '../../config/swareConfig';
 
+const nonIssuedRegex = /... (?:cancels|expires|continues)/;
+
 function filterByTime(cutoffMinutes: number, events: WxEvent[]) {
   const checkTerm = (cutoffMinutes * 60000 - Date.now()) / -1;
   return cutoffMinutes
@@ -10,21 +12,32 @@ function filterByTime(cutoffMinutes: number, events: WxEvent[]) {
 }
 
 function filterEvents(events, userConfig) {
-  // Filter by age first, since it can quickly filter many events before more complex filters
-  let filteredEvents = filterByTime(userConfig.age.value, events);
+  let filteredEvents = events.slice();
 
-  // CWA filter
-  if (!userConfig.showAllCWAs.value) {
-    filteredEvents = filteredEvents.filter((evt) => {
-      const cwaSetting = userConfig.cwas.children[evt.details.wfo];
-      return !cwaSetting || cwaSetting.value;
-    });
-  }
+  try {
+    // Filter by age first, since it can quickly filter many events before more complex filters
+    filteredEvents = filterByTime(userConfig.age.value, filteredEvents);
 
-  // Product filter
-  if (userConfig.severeMode.value) {
-    filteredEvents = filteredEvents.filter(x =>
-      swareConfig.events.SEVERE_MODE_PRODUCTS.includes(x.details.code));
+    // CWA filter
+    if (!userConfig.showAllCWAs.value) {
+      filteredEvents = filteredEvents.filter((evt) => {
+        const cwaSetting = userConfig.cwas.children[evt.details.wfo];
+        return !cwaSetting || cwaSetting.value;
+      });
+    }
+
+    // Product filter
+    if (userConfig.severeMode.value) {
+      filteredEvents = filteredEvents.filter(x =>
+        swareConfig.events.SEVERE_MODE_PRODUCTS.includes(x.details.code));
+    }
+
+    if (userConfig.hideNonIssued.value) {
+      filteredEvents = filteredEvents.filter(x =>
+        x.details.text && !x.details.text.slice(0, 13).match(nonIssuedRegex));
+    }
+  } catch(ex) {
+    console.error(ex);
   }
 
   return filteredEvents;

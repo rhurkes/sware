@@ -27,6 +27,41 @@ const getTextSpeech = (text: string): string => {
   return speech;
 };
 
+const text = 'AT 6:57 PM CDT...A LARGE TORNADO WAS MOVING ALONG INTERSTATE 44 WEST OF NEWCASTLE. ON ITS PRESENT PATH...THIS LARGE DAMAGING TORNADO WILL ENTER SOUTHWEST SECTIONS OF THE OKLAHOMA CITY METRO AREA BETWEEN 7:15 AND 7:30 PM. PERSONS IN MOORE AND SOUTH OKLAHOMA CITY SHOULD TAKE IMMEDIATE TORNADO PRECAUTIONS!';
+
+const maxSpaceSplits = 10;
+
+const handleSpaceSplits = (spaceSplits) => {
+  let result = [];
+  for (let i = 0; i < spaceSplits.length / maxSpaceSplits; i++) {
+    result = result.concat(spaceSplits.slice(i * maxSpaceSplits, (i + 1) * maxSpaceSplits).join(' '));
+  }
+  return result;
+};
+
+const breakUpText = (text) => {
+  const maxSpaceSplits = 15;
+
+  const handleSpaceSplits = (spaceSplits) => {
+    let result = [];
+    for (let i = 0; i < spaceSplits.length / maxSpaceSplits; i++) {
+      result = result.concat(spaceSplits.slice(i * maxSpaceSplits, (i + 1) * maxSpaceSplits).join(' '));
+    }
+    return result;
+  };
+
+  const ellipsesSplits = text.split('...');
+  const sentenceSplits = ellipsesSplits.map(x => x.split('. '));
+  const flattenedSentenceSplits = [].concat.apply([], sentenceSplits);
+
+  const longSentenceSplits = flattenedSentenceSplits.map(x => {
+    const spaceSplits = x.split(' ');
+    return spaceSplits.length > 15 ? handleSpaceSplits(spaceSplits) : x;
+  });
+  
+  return [].concat.apply([], longSentenceSplits);
+};
+
 const capitalize = (text: string): string => {
   return text && text.length ? `${text[0].toUpperCase()}${text.slice(1).toLowerCase()}` : '';
 };
@@ -45,6 +80,7 @@ const getHashCode = (input: any): number => {
 
 export default {
   capitalize,
+  breakUpText,
   fromCamelToRegularCase,
   getTextSpeech,
   getLocationSpeech,

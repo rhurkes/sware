@@ -9,17 +9,17 @@ event details.important and alerts decoration happens only on initial load, so c
 temporarily checking in dist files to get around linux build issues
 
 
-NEXT RELEASE
+THIS RELEASE
+[x] BUG: EAS alert tone should only play once per update
+[x] BUG: Tornado emergencies being filtered out by Hide Non-issued toggle
+[x] BUG: SPC canceled watches show as blank line
+[x] BUG: TOR LSR repeating and saying 'undefined'
+[x] speak more of the LSR text for tornado reports
 [x] home screen style updates
-[ ] BUG: Treat EAS alert tone like first alert
-[ ] BUG: spc canceled watches show as blank line
-[ ] remove continues/updates/cancels/expires toggle
+[x] remove continues/updates/cancels/expires toggle
 [x] react/redux should use production builds insted of development builds
-[ ] Auto build version for cache-busting
-[x] gzip served files from server - uncached app is <200kb and takes 700ms to load
-[ ] Error: JSONP request to https://weather.im/iembot-json/room/botstalk?seqnum=12441899 timed out at fetchJSONP.ts:63
-[ ] botstalk?seqnum=12441899&callback=jsonp_1490451708408_42307:1 Uncaught ReferenceError: jsonp_1490451708408_42307 is not defined]
-[ ] OPTIMIZATION: spending 700ms after fetching before load
+[x] Auto build version for cache-busting javascript/css
+[x] gzip served files from server - uncached app is 168kb and takes 600ms to load
 
 
 NEXT EPIC
@@ -72,7 +72,7 @@ hit 100% test coverage
 remove scheduling from middleware, put in app lifecycle
 remove as many instances of 'any' type as possible
 incorporate immutable (or ramda)
-vendor vs sware code bundles
+vendor vs sware code bundles - its small enough for now (150kb) that this isn't really needed
 need favicon
 getting messy passing props from app -> chrome -> whatever
 implement error handling strategy

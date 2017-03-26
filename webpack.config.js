@@ -17,10 +17,8 @@ const config = {
       title: 'sware',
       template: 'src/index.ejs'
     }),
-    new ExtractTextPlugin('styles.css'),
-    new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
-    }),
+    new ExtractTextPlugin('[name].[chunkhash].css'),
+    new webpack.DefinePlugin({ 'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV) }),
   ],
   module: {
     rules: [{
@@ -37,7 +35,7 @@ const config = {
     ]
   },
   output: {
-    filename: 'bundle.js',
+    filename: '[name].[chunkhash].js',
     path: path.resolve(__dirname, 'dist'),
   },
   devServer: {
