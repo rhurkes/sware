@@ -27,11 +27,8 @@ const getTextSpeech = (text: string): string => {
   return speech;
 };
 
-const text = 'AT 6:57 PM CDT...A LARGE TORNADO WAS MOVING ALONG INTERSTATE 44 WEST OF NEWCASTLE. ON ITS PRESENT PATH...THIS LARGE DAMAGING TORNADO WILL ENTER SOUTHWEST SECTIONS OF THE OKLAHOMA CITY METRO AREA BETWEEN 7:15 AND 7:30 PM. PERSONS IN MOORE AND SOUTH OKLAHOMA CITY SHOULD TAKE IMMEDIATE TORNADO PRECAUTIONS!';
-
-const maxSpaceSplits = 10;
-
 const handleSpaceSplits = (spaceSplits) => {
+  const maxSpaceSplits = 10;
   let result = [];
   for (let i = 0; i < spaceSplits.length / maxSpaceSplits; i++) {
     result = result.concat(spaceSplits.slice(i * maxSpaceSplits, (i + 1) * maxSpaceSplits).join(' '));

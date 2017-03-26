@@ -4,7 +4,7 @@ import {
   IFetchAPIAction,
   INetworkStat,
 } from '../middleware/fetchMiddlewareModel';
-import fake from '../../test_data/iem-tor-lsr';
+import fake from '../../test_data/iem-bad-alert';
 
 const useFakeData = false;
 

@@ -10,16 +10,7 @@ temporarily checking in dist files to get around linux build issues
 
 
 THIS RELEASE
-[x] BUG: EAS alert tone should only play once per update
-[x] BUG: Tornado emergencies being filtered out by Hide Non-issued toggle
-[x] BUG: SPC canceled watches show as blank line
-[x] BUG: TOR LSR repeating and saying 'undefined'
-[x] speak more of the LSR text for tornado reports
-[x] home screen style updates
-[x] remove continues/updates/cancels/expires toggle
-[x] react/redux should use production builds insted of development builds
-[x] Auto build version for cache-busting javascript/css
-[x] gzip served files from server - uncached app is 168kb and takes 600ms to load
+[ ] SPC outlooks should be marked important
 
 
 NEXT EPIC

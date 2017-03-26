@@ -7,7 +7,7 @@ import NWSProducts from '../models/nwsProducts';
 
 const regexPatterns = {
   LSRTorReport: /(\[.+?\]) (.+?) (reports TORNADO) at (.+? ...?) (.+)/i,
-  LSRHailReport: /(\[.+\]) (.+?) (reports HAIL).+\([E|M](.+) INCH\)/i,
+  LSRHailReport: /(\[.+\]) (.+?) (reports HAIL).+\([E|M|U](.+) INCH\)/i,
 };
 
 export const metaCode = {
@@ -151,6 +151,7 @@ function addMetaCodes(details, userConfig) {
             if (magnitude >= userConfig.alerts.children.hailSize.value) {
               details.alertTextValues = [textValues[0], textValues[1].replace('reports', `reports ${magnitude} inch`)];
               details.important = true;
+              details.metaCode = metaCode.HailReport;
             }
           }
         } else {
@@ -175,7 +176,6 @@ function addMetaCodes(details, userConfig) {
       if (details.text.indexOf(lsrTorMatch) > -1) {
         details = decorateTornadoLSRAlert(details);
       } else if (details.text.indexOf(lsrHailMatch) > -1) {
-        details.metaCode = metaCode.HailReport;
         details = decorateLSRAlert(details, regexPatterns.LSRHailReport);
       }
       break;
