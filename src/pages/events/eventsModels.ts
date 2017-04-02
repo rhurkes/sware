@@ -1,4 +1,4 @@
-export interface WxEvent {
+export interface IWxEvent {
   source: string;
   time: number;
   timeAgo: string;
@@ -12,6 +12,11 @@ export interface WxEvent {
     text: string;
     link: string;
     wfo: string;
-  },
+  };
   message: string;
 }
+
+export const EventSource = {
+  IEM: 'iem' as 'iem',
+  SpotterNetwork: 'spotter_network' as 'spotter_network',
+};

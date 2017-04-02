@@ -38,17 +38,18 @@ export interface INetworkStats {
 }
 
 export interface IFetchAPIAction {
-  type: string,
+  type: string;
   meta: {
     url: string,
     isJSONP?: boolean,
-    analyze? : boolean
+    analyze?: boolean
     moduleName: string,
+    source: string,
     polling?: {
       timerActionType: string,
       delay: number,
-      continueCheck?: Function,
+      continueCheck?: (state) => boolean,
       createNextAction?: Function,
     },
-  },
-};
+  };
+}

@@ -1,10 +1,10 @@
 import iemHelper, { IIEMMessageData } from '../../utility/iemHelper';
-import { WxEvent } from './eventsModels';
+import { IWxEvent, EventSource } from './eventsModels';
 import swareConfig from '../../config/swareConfig';
 
 const nonIssuedRegex = /... (?:cancels|expires|continues)/;
 
-function filterByTime(cutoffMinutes: number, events: WxEvent[]) {
+function filterByTime(cutoffMinutes: number, events: IWxEvent[]) {
   const checkTerm = (cutoffMinutes * 60000 - Date.now()) / -1;
   return cutoffMinutes
     ? events.filter(x => x.time >= checkTerm)
@@ -20,7 +20,7 @@ function filterEvents(events, userConfig) {
 
     // CWA filter
     if (!userConfig.showAllCWAs.value) {
-      filteredEvents = filteredEvents.filter((evt) => {
+      filteredEvents = filteredEvents.filter(evt => {
         const cwaSetting = userConfig.cwas.children[evt.details.wfo];
         return !cwaSetting || cwaSetting.value;
       });
@@ -28,15 +28,18 @@ function filterEvents(events, userConfig) {
 
     // Product filter
     if (userConfig.severeMode.value) {
-      filteredEvents = filteredEvents.filter(x =>
-        swareConfig.events.SEVERE_MODE_PRODUCTS.includes(x.details.code));
+      filteredEvents = filteredEvents.filter(evt =>
+        evt.source !== EventSource.IEM ||
+        swareConfig.events.SEVERE_MODE_PRODUCTS.includes(evt.details.code));
     }
 
+    // Non-issued filter
     if (userConfig.hideNonIssued.value) {
-      filteredEvents = filteredEvents.filter(x =>
-        x.details.text && !x.details.text.slice(0, 13).match(nonIssuedRegex));
+      filteredEvents = filteredEvents.filter(evt =>
+        evt.source !== EventSource.IEM ||
+        evt.details.text && !evt.details.text.slice(0, 13).match(nonIssuedRegex));
     }
-  } catch(ex) {
+  } catch (ex) {
     console.error(ex);
   }
 
@@ -53,9 +56,9 @@ function truncateOldEvents(events, condensedEventsLength, eventLimit) {
   return events;
 }
 
-export function processIncomingEvents(incomingEvents: IIEMMessageData[], events: WxEvent[], userConfig: any, eventLimit: number) {  
+export function processIncomingEvents(incomingEvents: IIEMMessageData[], events: IWxEvent[], userConfig: any, eventLimit: number) {
   const formattedEvents = incomingEvents
-    .map(x => iemHelper.formatMessage(x, userConfig))
+    .map(x => iemHelper.formatEvent(x, userConfig))
     .filter(x => x) // Remove null results from formatter
     .reverse(); // Ensure newest events first
 

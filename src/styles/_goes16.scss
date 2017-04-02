@@ -1,0 +1,29 @@
+#goes-container {
+  position: relative;
+
+  #goes-images {
+    display: flex;
+    justify-content: center;
+    &> img {
+      max-width: 100%;
+      max-height: calc(100vh - 100px);
+      position: absolute;
+    } 
+  }
+  .imageIndicators {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 16px;
+
+    .indicator {
+      height: 8px;
+      width: 8px;
+      background-color: #333;
+      border: 1px solid #666;
+    }
+
+    .indicator.current {
+      background-color: #aaa;
+    }
+  }
+}

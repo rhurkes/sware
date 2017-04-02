@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-interface ToggleProps {
+interface IToggleProps {
   id: string;
   checked?: boolean;
   changeHandler: () => void;
@@ -8,13 +8,13 @@ interface ToggleProps {
 
 // TODO generate id if none passed
 
-const Toggle: React.StatelessComponent<any> = (props: ToggleProps) => {
+const Toggle: React.StatelessComponent<any> = (props: IToggleProps) => {
   const { id, checked, changeHandler } = props;
 
   return (
     <div className="toggle">
       <input type="checkbox" id={id} checked={checked} onChange={changeHandler} />
-      <label htmlFor={id}></label>    
+      <label htmlFor={id} />
     </div>
   );
 }

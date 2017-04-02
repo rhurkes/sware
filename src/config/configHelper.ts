@@ -1,8 +1,6 @@
-import * as R from 'ramda';
 import textHelper from '../utility/textHelper';
 import objectHelper from '../utility/objectHelper';
 import { default as defaultUserConfig } from '../config/userConfig';
-import Module from '../pages/modules';
 
 // TODO rewrite all this to be up to date when configs are figured out!
 /* NOTES ON CONFIGURATION:
@@ -30,7 +28,6 @@ import Module from '../pages/modules';
   - Auto-generated config item decorations:
       __path: string. Pipe delimited value specifying how to traverse the object for get/set operations.
       __open: boolean. If config item has children, this specifies if the children are visible or not.
-      
   */
 
 /**
@@ -38,7 +35,7 @@ import Module from '../pages/modules';
  * text properties in case one is not specified, and parent properties for easy traversal.
  */
 function decorateConfig(config, parentPath = '') {
-  Object.keys(config).forEach((key) => {
+  Object.keys(config).forEach(key => {
     const configItem = config[key];
     const valueType = typeof configItem;
 
@@ -65,10 +62,13 @@ function saveUserConfig(moduleName: string, userConfig) {
   localStorage.setItem(`${moduleName}_config`, serializedUserConfig);
 }
 
-// TODO implement this
-function resetToDefaultConfig() {
-  localStorage.clear();
-  return defaultUserConfig;
+function validateLocalConfig() {
+  const userConfigVersionKey = 'userConfigVersion';
+
+  if (localStorage.getItem(userConfigVersionKey) !== defaultUserConfig.version.toString()) {
+    localStorage.clear();
+    localStorage.setItem(userConfigVersionKey, defaultUserConfig.version.toString());
+  }
 }
 
 // TODO write unit tests for this!
@@ -85,13 +85,10 @@ function getUserConfig(moduleName: string) {
   if (!serializedConfig) { return defaultModuleConfig; }
 
   try {
-    const savedConfig = decorateConfig(JSON.parse(serializedConfig)); 
-    const mergeFunc = (l, r) => {
-      return typeof r !== 'undefined' ? r : l;
-    }
+    const savedConfig = decorateConfig(JSON.parse(serializedConfig));
     const mergedConfig = objectHelper.deepMerge(defaultModuleConfig, savedConfig);
     return mergedConfig;
-  } catch(ex) {
+  } catch (ex) {
     console.error('Unable to merge configs, falling back to defaults', ex);
   }
 
@@ -101,5 +98,5 @@ function getUserConfig(moduleName: string) {
 export default {
   getUserConfig,
   saveUserConfig,
-  resetToDefaultConfig,
+  validateLocalConfig,
 };

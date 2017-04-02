@@ -2,6 +2,7 @@
 @import 'layout';
 @import 'mixins';
 @import 'events';
+@import 'goes16';
 @import 'shared-components';
 @import 'reset';
 @import 'menulist';
@@ -18,6 +19,12 @@ body, button {
 
 button {
     text-transform: uppercase;
+}
+
+select {
+    background: #fff;
+    height: 32px;
+    font-size: 18px;
 }
 
 .clickable {
@@ -80,6 +87,9 @@ button {
                 text-decoration: none;
                 display: flex;
                 align-items: center;
+                height: 56px;
+                width: 100%;
+                cursor: pointer;
             }
         }
 
@@ -187,7 +197,7 @@ header {
 }
 
 .page {
-    padding: 16px 24px 24px 16px;
+    padding: 16px;
     margin-top: $line-3-height;
     height: calc(100vh - 88px);
     overflow: scroll;

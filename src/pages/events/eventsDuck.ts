@@ -1,14 +1,12 @@
 import swareConfig from '../../config/swareConfig';
 import datetimeHelper from '../../utility/datetimeHelper';
 import { IFetchAPIAction } from '../../middleware/fetchMiddlewareModel';
-import { WxEvent } from './eventsModels';
 import actions from '../../actions';
 import configHelper from '../../config/configHelper';
 import objectHelper from '../../utility/objectHelper';
 import eventProcessor from './eventsProcessor';
-import * as R from 'ramda';
-import audio, { AudioType, Sound } from '../../utility/audio';
 import Modules from '../../pages/modules';
+import { EventSource } from './eventsModels';
 
 export const moduleName = Modules.Events;
 
@@ -16,16 +14,38 @@ export const moduleName = Modules.Events;
 export const getFilteredNewEvents = state => state[moduleName].filteredNewEvents;
 export const getFilteredEvents = state => state[moduleName].filteredEvents;
 export const getLastIEMSequence = state => state[moduleName].lastIEMSequence;
+export const getLastSNSequence = state => state[moduleName].lastSNSequence;
 export const getPollingTimer = state => state[moduleName].pollingTimer;
 export const getRequiresFilterEvents = state => state[moduleName].requiresFilterEvents;
 export const getEventsUserConfig = state => state[moduleName].userConfig;
 
 // Action creators
-export const updateEventsTimeAgo = (eventsUserConfig) =>  ({ type: actions.UPDATE_EVENTS_TIMEAGO, eventsUserConfig });
-export const triggerFilterEvents = (eventsUserConfig) => ({ type: actions.TRIGGER_FILTER_EVENTS, eventsUserConfig });
+export const updateEventsTimeAgo = eventsUserConfig => ({ type: actions.UPDATE_EVENTS_TIMEAGO, eventsUserConfig });
+export const triggerFilterEvents = eventsUserConfig => ({ type: actions.TRIGGER_FILTER_EVENTS, eventsUserConfig });
 
 export const updateUserConfig = (path: string, value, key: string = 'value') => ({
   type: actions.UPDATE_EVENTS_USER_CONFIG, path, value, key,
+});
+
+export const fetchSNEvents = (lastSNSequence: number): IFetchAPIAction => ({
+  type: actions.FETCH_REQUEST,
+  meta: {
+    url: swareConfig[moduleName].SN_DATA_URL.replace(/{seq}/, lastSNSequence.toString()),
+    moduleName,
+    source: EventSource.SpotterNetwork,
+    polling: {
+      delay: swareConfig[moduleName].POLLING_INTERVAL_MS,
+      timerActionType: actions.POLLING_TIMER_UPDATE,
+      continueCheck: store => store.getState()[moduleName].userConfig.fetching.value,
+      createNextAction: (store, action) => {
+        const nextAction = Object.assign({}, action);
+        nextAction.meta.url = swareConfig[moduleName].SN_DATA_URL.replace(
+          '{seq}', store.getState()[moduleName].lastSNSequence);
+
+        return nextAction;
+      },
+    },
+  },
 });
 
 export const fetchEvents = (lastIEMSequence: number): IFetchAPIAction => ({
@@ -35,6 +55,7 @@ export const fetchEvents = (lastIEMSequence: number): IFetchAPIAction => ({
     isJSONP: true,
     analyze: true,
     moduleName,
+    source: EventSource.IEM,
     polling: {
       delay: swareConfig[moduleName].POLLING_INTERVAL_MS,
       timerActionType: actions.POLLING_TIMER_UPDATE,
@@ -58,6 +79,7 @@ const initialState = {
   filteredEvents: [],
   filteredNewEvents: [],
   lastIEMSequence: 0,
+  lastSNSequence: 0,
   pollingTimer: 0,
 };
 
@@ -69,24 +91,38 @@ export const reducer = (state = initialState, action: any) => {
       };
     }
     case actions.FETCH_SUCCESS: {
-      if (action.moduleName !== moduleName || !action.data ||
-        !action.data.messages || !action.data.messages.length) {
+      if (action.moduleName !== moduleName || !action.data) {
         return state;
       }
 
-      const lastIEMSequence = action.data.messages[action.data.messages.length - 1].seqnum;
-      const { events, filteredEvents, filteredNewEvents } = eventProcessor.processIncomingEvents(
-        action.data.messages, state.events, state.userConfig, swareConfig[moduleName].EVENT_LIMIT);
+      if (action.source === EventSource.IEM) {
+        if (!action.data.messages || !action.data.messages.length) { return state; }
 
-      return {
-        ...state,
-        events, filteredEvents, filteredNewEvents, lastIEMSequence,
-      };
+        const lastIEMSequence = action.data.messages[action.data.messages.length - 1].seqnum;
+        const { events, filteredEvents, filteredNewEvents } = eventProcessor.processIncomingEvents(
+          action.data.messages, state.events, state.userConfig, swareConfig[moduleName].EVENT_LIMIT);
+
+        return {
+          ...state,
+          events, filteredEvents, filteredNewEvents, lastIEMSequence,
+        };
+      } else if (action.source === EventSource.SpotterNetwork) {
+        if (!action.data || !action.data.events || !action.data.events.length) { return state; }
+
+        const lastSNSequence = action.data.events[action.data.events.length - 1].details.sequenceID;
+        const { events, filteredEvents, filteredNewEvents } = eventProcessor.processIncomingEvents(
+          action.data.events, state.events, state.userConfig, swareConfig[moduleName].EVENT_LIMIT);
+
+        return {
+          ...state,
+          events, filteredEvents, filteredNewEvents, lastSNSequence,
+        };
+      }
     }
     case actions.UPDATE_EVENTS_USER_CONFIG: {
       const userConfig = objectHelper.setFromPath(state.userConfig, action.key, action.path, action.value);
       configHelper.saveUserConfig(moduleName, userConfig);
-      
+
       // Updating the fetching status should not trigger a filter-only action
       const requiresFilterEvents = action.path !== 'fetching';
 
@@ -96,7 +132,7 @@ export const reducer = (state = initialState, action: any) => {
       if (!state.events.length) { return state; }
 
       // TODO can probably move this to event processor
-      const updatedEvents = state.events.map((x) => {
+      const updatedEvents = state.events.map(x => {
         const newEvent = Object.assign({}, x);
         newEvent.timeAgo = datetimeHelper.getTimeAgo(x.tsUTC);
 

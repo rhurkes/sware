@@ -1,10 +1,9 @@
 import * as React from 'react';
-import { WxEvent } from './eventsModels';
-import { metaCode } from '../../utility/iemHelper';
+import { IWxEvent } from './eventsModels';
 import swareConfig from '../../config/swareConfig';
 
 interface ILineComponentProps {
-  event: WxEvent;
+  event: IWxEvent;
 }
 
 const LineComponent = (props: ILineComponentProps) => {
@@ -34,7 +33,9 @@ const LineComponent = (props: ILineComponentProps) => {
               rel="noopener noreferrer"
               target="_blank"
               href={link}
-            >{source}</a>]
+            >
+              {source}
+            </a>]
           </span>
         </div>
       </div>

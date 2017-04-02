@@ -2,12 +2,22 @@ import * as moment from 'moment';
 import { clone } from 'ramda';
 import datetimeHelper from './datetimeHelper';
 import textHelper from './textHelper';
-import { WxEvent } from '../pages/events/eventsModels';
+import { IWxEvent, EventSource } from '../pages/events/eventsModels';
 import NWSProducts from '../models/nwsProducts';
+
+// TODO this needs to process all events, and potentially be broke out from there
+
+const snTypeMap = [
+  'unused', 'tornado', 'funnel', 'wall cloud', 'hail', 'wind',
+  'flood', 'flash flood', 'other', 'rain', 'snow',
+];
 
 const regexPatterns = {
   LSRTorReport: /(\[.+?\]) (.+?) (reports TORNADO) at (.+? ...?) (.+)/i,
   LSRHailReport: /(\[.+\]) (.+?) (reports HAIL).+\([E|M|U](.+) INCH\)/i,
+  TornadoEmergency: /TORNADO EMERGENCY/i,
+  TornadoWatchStates: /(\[..\])/g,
+  TornadoWarningSource: /\[tornado: ([A-Z|\s]+)[\]|,|\s]/i,
 };
 
 export const metaCode = {
@@ -17,7 +27,7 @@ export const metaCode = {
   HailReport: 'hail-report' as 'hail-report',
   TornadoWatch: 'tornado-watch' as 'tornado-watch',
   SevereThunderstormWatch: 'severe-watch' as 'severe-watch',
-}
+};
 
 export const convectiveRisk = {
   None: 'None' as 'None',
@@ -37,7 +47,6 @@ export interface IIEMMessageData {
 
 const source = 'iem';
 const tmpElement = document.createElement('tmp');
-const tornadoEmergencyRegex = new RegExp('TORNADO EMERGENCY', 'i');
 
 function parseHTML(html: string): any {
   tmpElement.innerHTML = html;
@@ -90,6 +99,7 @@ function condenseSPCOutlooks(incomingEvents: any[]): any[] {
     const reversePTSSummary = clone(ptsSummary).reverse();
     const highestRisk = reversePTSSummary.find(x => x.cwas.length > 0) || ptsSummary[0];
     const condensedEvent = clone(condensedEvents[firstIndex]);
+    condensedEvent.details.important = true;
     /* Due to bugs in Chrome's speech synth, we need to split this message when creating
       the alert. Make sure your string has a ':' character so we can split on it */
     condensedEvent.details.text = highestRisk.risk === convectiveRisk.None
@@ -120,14 +130,15 @@ function getProductFromProductID(productID: string): any {
 // TODO all this meta code/alert stuff really should be broken out into a separate module
 // TODO should split this into separate functions for each thing
 function addMetaCodes(details, userConfig) {
-  function decorateTornadoLSRAlert(details: any): string[] {
+  function decorateTornadoLSRAlert(details: any): any {
     const regex = new RegExp(regexPatterns.LSRTorReport);
     const matches = details.text.match(regex);
+
     if (matches && matches.length === 6) {
       const firstText = `${textHelper.getLocationSpeech(matches[1])}, ${textHelper.getTextSpeech(matches[2].concat(' ', matches[3]))},`;
-      const secondText = ` at ${matches[4]}`
+      const secondText = ` at ${matches[4]}`;
       const finalText = textHelper.breakUpText(matches[5]);
-      details.alertTextValues = [firstText, secondText].concat(finalText);
+      details.alertTextValues = [ firstText, secondText ].concat(finalText);
       details.important = true;
       details.metaCode = metaCode.TornadoReport;
     }
@@ -135,7 +146,26 @@ function addMetaCodes(details, userConfig) {
     return details;
   }
 
-  function decorateLSRAlert(details: any, matchPattern: RegExp): string[] {
+  function decorateTornadoWatch(details: any): any {
+    const regex = new RegExp(regexPatterns.TornadoWatchStates);
+    const matches = details.text.match(regex);
+
+    details.metaCode = metaCode.TornadoWatch;
+    details.important = true;
+    details.alertTextValues = [ 'The Storm Prediction Center has issued a tornado watch' ];
+
+    if (matches) {
+      if (matches.length > 1) {
+        matches.splice(matches.length - 1, 0, ', and ');
+      }
+      const states = textHelper.getLocationSpeech(matches.join(', '));
+      details.alertTextValues.push(` for portions of ${states}`);
+    }
+
+    return details;
+  }
+
+  function decorateLSRAlert(details: any, matchPattern: RegExp): any {
     try {
       const regex = new RegExp(matchPattern);
       const matches = details.text.match(regex);
@@ -149,7 +179,7 @@ function addMetaCodes(details, userConfig) {
           if (matchPattern === regexPatterns.LSRHailReport) {
             const magnitude = parseFloat(matches[4]);
             if (magnitude >= userConfig.alerts.children.hailSize.value) {
-              details.alertTextValues = [textValues[0], textValues[1].replace('reports', `reports ${magnitude} inch`)];
+              details.alertTextValues = [ textValues[0], textValues[1].replace('reports', `reports ${magnitude} inch`) ];
               details.important = true;
               details.metaCode = metaCode.HailReport;
             }
@@ -158,8 +188,22 @@ function addMetaCodes(details, userConfig) {
           details.alertTextValues = textValues;
         }
       }
-    } catch(ex) {
+    } catch (ex) {
       console.error(ex);
+    }
+
+    return details;
+  }
+
+  function decorateTornadoWarning(details: any): any {
+    details.important = true;
+    details.alertTextValues = [ `${details.wfo} issues tornado warning` ];
+
+    const regex = new RegExp(regexPatterns.TornadoWarningSource);
+    const matches = details.text.match(regex);
+
+    if (matches && matches[1]) {
+      details.alertTextValues.push(`source: ${matches[1].toLowerCase()}`);
     }
 
     return details;
@@ -181,11 +225,13 @@ function addMetaCodes(details, userConfig) {
       break;
     }
     case NWSProducts.TornadoWarning: {
-      details.important = true;
+      details = decorateTornadoWarning(details);
       // fall through to SVS to check for tor emergency
     }
     case NWSProducts.SevereWeatherStatement: {
-      if (tornadoEmergencyRegex.test(details.text)) {
+      const regex = new RegExp(regexPatterns.TornadoEmergency);
+
+      if (regex.test(details.text)) {
         details.metaCode = metaCode.TornadoEmergency;
         details.important = true;
       }
@@ -199,8 +245,7 @@ function addMetaCodes(details, userConfig) {
     }
     case NWSProducts.WeatherWatchClearanceNotification: {
       if (details.text.indexOf('issues Tornado Watch') > -1) {
-        details.metaCode = metaCode.TornadoWatch;
-        details.important = true;
+        details = decorateTornadoWatch(details);
       } else if (details.text.indexOf('issues Severe Thunderstorm Watch') > -1) {
         details.metaCode = metaCode.SevereThunderstormWatch;
         details.important = true;
@@ -216,7 +261,7 @@ function addMetaCodes(details, userConfig) {
 function getDetails(productID: string, message: string): any {
   const details: any = {};
   const product = getProductFromProductID(productID);
-  
+
   details.code = product.code;
   details.wfo = product.wfo;
 
@@ -227,7 +272,43 @@ function getDetails(productID: string, message: string): any {
   return details;
 }
 
-function formatMessage(data: IIEMMessageData, userConfig: any): WxEvent {
+function formatEvent(evt: any, userConfig: any): IWxEvent {
+  if (evt.author === 'iembot') {
+    return formatIEMMessage(evt, userConfig);
+  } else if (evt.source === EventSource.SpotterNetwork) {
+    return formatSNEvent(evt, userConfig);
+  }
+}
+
+function formatSNEvent(evt: any, userConfig: any): IWxEvent {
+  if (!evt || !userConfig.showSpotterNetworkReports.value) { return; }
+
+  try {
+    evt.details.code = 'sn';
+    evt.details.important = true;
+    evt.timeAgo = datetimeHelper.getTimeAgo(evt.tsUTC);
+    evt.timeLabel = `${moment(evt.tsUTC).format('HH:mm')}Z`;
+
+    let report = snTypeMap[evt.details.type].toUpperCase();
+    // Hail sizes are optional, with inches as units when present
+    if (evt.details.type === 4 && evt.details.size) {
+      report = `${evt.details.size}" ${report}`;
+    }
+
+    evt.details.text = `${report} reported at ${evt.timeLabel} by ${evt.details.user}`;
+
+    if (evt.details.notes && evt.details.notes !== 'None') {
+      evt.details.text += `: ${evt.details.notes}`;
+    }
+
+    return evt;
+  } catch (ex) {
+    console.error(ex, evt);
+    return null;
+  }
+}
+
+function formatIEMMessage(data: IIEMMessageData, userConfig: any): IWxEvent {
   if (!data || !data.message || !data.ts) { return null; }
 
   try {
@@ -261,11 +342,11 @@ function formatMessage(data: IIEMMessageData, userConfig: any): WxEvent {
     details.text = parsedHTML.text
       .replace(`(${details.code})`, '')
       .replace(' (View text)', '')
-      .replace(' -- .', '')
+      .replace(' --', '')
       .trim();
 
-      details.link = parsedHTML.link;
-      details = addMetaCodes(details, userConfig);
+    details.link = parsedHTML.link;
+    details = addMetaCodes(details, userConfig);
 
     return {
       details,
@@ -278,12 +359,12 @@ function formatMessage(data: IIEMMessageData, userConfig: any): WxEvent {
       message,
     };
   } catch (ex) {
-    console.error('formatMessage', ex, data);
+    console.error(ex, data);
     return null;
   }
 }
 
 export default {
-  formatMessage,
+  formatEvent,
   condenseSPCOutlooks,
 };

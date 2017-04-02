@@ -12,17 +12,16 @@ export const getGeolocation = state => state[moduleName].geolocation;
 export const getNetworkStats = state => state[moduleName].networkStats;
 export const getAudioQueue = state => state[moduleName].audioQueue;
 export const getUserConfig = state => state[moduleName].userConfig;
-// export const getActiveData = state => 
 
 // Action creators
 export const triggerIyaProcessing = (events: any) => ({ type: actions.TRIGGER_IYA_PROCESSING, events });
 export const toggleSidebarOpen = (open: boolean) => ({ type: actions.TOGGLE_SIDEBAR_OPEN, open });
 export const queueAudioAlert = () => ({ type: actions.QUEUE_AUDIO_ALERT });
-export const popAudioQueue= () => ({ type: actions.POP_AUDIO_QUEUE });
+export const popAudioQueue = () => ({ type: actions.POP_AUDIO_QUEUE });
 
 export const updateGeolocation = (geolocation: Coordinates) => ({
   type: actions.UPDATE_GEOLOCATION,
-  geolocation
+  geolocation,
 });
 
 const initialState = {
@@ -39,7 +38,7 @@ const initialState = {
     errorPercent: 0,
     rawMsTimes: [],
   },
-}
+};
 
 export const reducer = (state = initialState, action: any) => {
   switch (action.type) {
@@ -60,7 +59,7 @@ export const reducer = (state = initialState, action: any) => {
     }
     case actions.UPDATE_GEOLOCATION: {
       return {
-        ...state, geolocation: action.geolocation
+        ...state, geolocation: action.geolocation,
       };
     }
     case actions.FETCH_SUCCESS:

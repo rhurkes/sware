@@ -12,10 +12,15 @@ const fromCamelToRegularCase = (text: string): string => {
 };
 
 const getLocationSpeech = (text: string): string => {
-  let speech = text.slice(1);
+  let speech = ` ${text} `; // Easy way to handle EoL characters
+  speech = speech.replace(/[\[|\]]/g, '');
+
   Object.keys(stateMappings).forEach(x => {
-    speech = speech.replace(new RegExp(` ${x}]`), stateMappings[x]);
+    const match = speech.match(new RegExp(`([\\s|,])(${x})([\\s|,])`));
+    if (!match) { return; }
+    speech = speech.replace(match[0], `${match[1]}${stateMappings[x]}${match[3]}`);
   });
+
   return getTextSpeech(speech);
 };
 

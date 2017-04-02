@@ -1,0 +1,18 @@
+  
+  
+Refresh: 1
+Threshold: 999
+Title: Spotter Network - Reports Only
+Font: 1, 11, 0, "Courier New"
+IconFile: 3, 22, 22, 11, 11, "http://www.spotternetwork.org/icon/sn_reports.png"
+IconFile: 4, 22, 22, 11, 11, "http://www.spotternetwork.org/icon/sn_reports_30.png"
+IconFile: 5, 22, 22, 11, 11, "http://www.spotternetwork.org/icon/sn_reports_60.png"
+
+Icon: 30.550604,-97.851341,000,3,3,"Reported By: Kevin Faure\nNot Rotating Wall Cloud\nTime: 2017-04-02 14:49:16 UTC\nNotes: Reported 49mph wind"
+Icon: 30.265364,-92.262917,000,3,4,"Reported By: Marcus Toups\nHail\nTime: 2017-04-02 14:45:26 UTC\nSize: Notes: None"
+Icon: 30.259600,-97.901298,000,3,4,"Reported By: Brett Ramirez\nHail\nTime: 2017-04-02 14:38:00 UTC\nSize: 1.00" (Quarter)\nNotes: None"
+Icon: 32.127056,-94.813271,000,3,4,"Reported By: Patrick Dooley\nHail\nTime: 2017-04-02 14:36:42 UTC\nSize: Notes: None"
+Icon: 29.870655,-98.292282,000,3,7,"Reported By: Aaron Klopp\nFlash Flood\nTime: 2017-04-02 14:19:00 UTC\nNotes: area of 2673 high straight line winds the last 15 minutes causing tree damage. Heavy down pour causing low water crossing flooding, flash flooding in low areas and roadways."
+Icon: 29.405842,-98.505211,000,3,3,"Reported By: David Blackerby\nNot Rotating Wall Cloud\nTime: 2017-04-02 14:03:54 UTC\nNotes: visible wall cloud with distinct base level rotation east of I35%2FI10 corridor.    no funnel cloud or distinct lowering observed."
+Icon: 30.124800,-92.147102,000,4,4,"Reported By: Dean Breaux\nHail\nTime: 2017-04-02 13:37:00 UTC\nSize: 0.75" (Penny)\nNotes: Pea size hail for approximately 5 minutes in Maurice La."
+  

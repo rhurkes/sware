@@ -1,9 +1,31 @@
 import cwas from '../mappings/cwas';
+import codModels from '../models/codModels';
 import Modules from '../pages/modules';
 
 // TODO might need to break this up into separate files once we get more modules in play
 
 const appConfig = {};
+
+const goes16Config = {
+  fetching: {
+    value: true,
+  },
+  region: {
+    value: 'cenplains',
+    __options: ['cenplains', 'meso'],
+    __subtextfunc: x => codModels.goes16Regions[x],
+  },
+  band: {
+    value: '02',
+    __options: ['02', '04', '05', '09', '13'],
+    __subtextfunc: x => codModels.goes16Bands[x],
+  },
+  frames: {
+    value: 12,
+    __options: [6, 12, 24, 36],
+    __subtext: 'Number of images to backfill for animation',
+  }
+};
 
 const eventsConfig = {
   fetching: {
@@ -21,10 +43,13 @@ const eventsConfig = {
     __subtext: 'Hides continues/expires/cancels events',
     __order: 2,
   },
+  /*showSpotterNetworkReports: {
+    value: true,
+  },*/
   age: {
     value: 0,
     __subtextfunc: x => x === 0 ? 'Do not filter by age' : `Showing events from last ${x} minutes`,
-    __options: [0, 15, 30, 45, 60, 90, 120, 180],
+    __options: [ 0, 15, 30, 45, 60, 90, 120, 180 ],
     __order: 3,
   },
   alerts: {
@@ -51,7 +76,7 @@ const eventsConfig = {
       hailSize: {
         value: 2,
         __subtextfunc: x => x === 0 ? 'Do not alert by size' : `Alerts for hail reports of ${x}" and larger`,
-        __options: [0, 1, 2, 3, 4],
+        __options: [ 0, 1, 2, 3, 4 ],
       },
     }
   },
@@ -77,7 +102,7 @@ const eventsConfig = {
 
 // Dynamically generate CWA config
 const sortedCWAs = Object.keys(cwas).sort((a, b) => cwas[a].st.localeCompare(cwas[b].st));
-sortedCWAs.forEach((cwa) => {
+sortedCWAs.forEach(cwa => {
   eventsConfig.cwas.children[cwa] = {
     value: false,
     __text: cwa.toUpperCase(),
@@ -88,4 +113,6 @@ sortedCWAs.forEach((cwa) => {
 export default {
   [Modules.App]: appConfig,
   [Modules.Events]: eventsConfig,
+  [Modules.GOES16]: goes16Config,
+  version: 1,
 };

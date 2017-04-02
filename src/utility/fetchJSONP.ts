@@ -31,7 +31,7 @@ export function fetchJSONP(_url) {
     const callbackFunction = generateCallbackFunction();
     const scriptId = `${jsonpCallback}_${callbackFunction}`;
 
-    window[callbackFunction] = (response) => {
+    window[callbackFunction] = response => {
       const splitCallbackName = callbackFunction.split('_');
       const callStartTime = parseInt(splitCallbackName[1], 10);
       const elapsedMs = Date.now() - callStartTime;

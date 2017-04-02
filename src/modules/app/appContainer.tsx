@@ -1,6 +1,6 @@
 import { connect, MergeProps } from 'react-redux';
 import AppComponent from './appComponent';
-import { routeMappings, RouteMapping } from '../../pages/routes';
+import { routeMappings, IRouteMapping } from '../../pages/routes';
 import {
   toggleSidebarOpen, getSidebarOpen, getGeolocation, updateGeolocation, getAudioQueue,
   popAudioQueue, getUserConfig,
@@ -13,7 +13,7 @@ const mapStateToProps = (state: any, ownProps) => ({
   userConfig: getUserConfig(state),
 });
 
-const mergeProps = (stateProps, dispatchProps, ownProps): MergeProps<{}, {}, RouteMapping[]> => {
+const mergeProps = (stateProps, dispatchProps, ownProps): MergeProps<{}, {}, IRouteMapping[]> => {
   return Object.assign({}, ownProps, stateProps, dispatchProps, { routeMappings });
 };
 

@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { Link } from 'react-router';
 import Icon from '../../shared-components/icon';
-import { RouteMapping } from '../../pages/routes';
+import { IRouteMapping } from '../../pages/routes';
 
 interface ISidebarComponentProps {
-  routeMappings: Array<RouteMapping>;
+  routeMappings: IRouteMapping[];
   isOpen: boolean;
   routeChangeAction: (open: boolean) => void;
 }

@@ -21,67 +21,68 @@ function fireEASAlert() {
 }
 
 // TODO put these all into a single function
-function hailWarningRule(evt, store?) {
-  if (evt.details.metaCode === metaCode.HailReport) {
+function hailWarningRule(details, store?) {
+  if (details.metaCode === metaCode.HailReport) {
     fireFirstAlert();
-    audio.speak(evt.details.alertTextValues);
+    audio.speak(details.alertTextValues);
   }
 }
 
-function torWatchRule(evt, store?) {
-  if (evt.details.metaCode === metaCode.TornadoWatch) {
+function torWatchRule(details, store?) {
+  if (details.metaCode === metaCode.TornadoWatch) {
     fireEASAlert();
-    audio.speak(['Storm Prediction Center issues Tornado Watch']);
+    audio.speak(details.alertTextValues);
   }
 }
 
-function torWarningRule(evt, store?) {
-  if (evt.details.code === NWSProducts.TornadoWarning) {
+function torWarningRule(details, store?) {
+  if (details.code === NWSProducts.TornadoWarning) {
     fireFirstAlert();
-    audio.speak([`${evt.details.wfo.toUpperCase()} issues tornado warning`]);
+    audio.speak(details.alertTextValues);
   }
 }
 
-function torReportRule(evt, store?) {
-  if (evt.details.metaCode === metaCode.TornadoReport) {
+function torReportRule(details, store?) {
+  if (details.metaCode === metaCode.TornadoReport) {
     fireFirstAlert();
-    audio.speak(evt.details.alertTextValues);
+    audio.speak(details.alertTextValues);
   }
 }
 
-function mdRule(evt, store?) {
-  if (evt.details.metaCode === metaCode.MesoscaleDiscussion) {
+function mdRule(details, store?) {
+  if (details.metaCode === metaCode.MesoscaleDiscussion) {
     fireFirstAlert();
-    audio.speak([evt.details.text]);
+    audio.speak([ details.text ]);
   }
 }
 
-function torEmergencyRule(evt, store?) {
-  if (evt.details.metaCode === metaCode.TornadoEmergency) {
+function torEmergencyRule(details, store?) {
+  if (details.metaCode === metaCode.TornadoEmergency) {
     fireEASAlert()
-    audio.speak([evt.details.text]);
+    audio.speak([ details.text ]);
   }
 }
 
-function spcOutlookRule(evt, store?) {
-  if (evt.details.code === NWSProducts.ProbabilisticOutlookPoints) {
+function spcOutlookRule(details, store?) {
+  if (details.code === NWSProducts.ProbabilisticOutlookPoints) {
     fireFirstAlert();
-    audio.speak(evt.details.text.split(':'));
+    audio.speak(details.text.split(':'));
   }
 }
 
-const eventsRules = [spcOutlookRule, mdRule, torEmergencyRule, torReportRule, torWarningRule,
-  hailWarningRule, torWatchRule];
+const eventsRules = [ spcOutlookRule, mdRule, torEmergencyRule, torReportRule, torWarningRule,
+  hailWarningRule, torWatchRule ];
 
 function processEventsRules(events, store) {
   eventsRules.forEach(rule => {
-    events.forEach(evt => rule(evt, store));
+    events.forEach(evt => rule(evt.details, store));
   });
 }
 
 const processor = store => next => action => {
   if (action.type === actions.TRIGGER_IYA_PROCESSING) {
     firstAlertFired = false;  // Reset on fresh batch of events
+    firstEASAlertFired = false;  // Reset on fresh batch of events
     processEventsRules(action.events, store);
   }
 

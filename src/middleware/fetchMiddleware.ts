@@ -4,7 +4,8 @@ import {
   IFetchAPIAction,
   INetworkStat,
 } from '../middleware/fetchMiddlewareModel';
-import fake from '../../test_data/iem-bad-alert';
+import fake from '../../test_data/iem-tor-warning';
+import fakeSN from '../../test_data/sn-hail-no-size';
 
 const useFakeData = false;
 
@@ -21,13 +22,14 @@ const fetchAPI = (store: any) => (next: any) => (action: IFetchAPIAction): void 
   });
 
   if (!action.meta || !action.meta.url) { return next(action); }
-  const { url, isJSONP, moduleName, polling } = action.meta;
+  const { url, isJSONP, moduleName, polling, source } = action.meta;
 
   if (useFakeData) {
     store.dispatch({
       type: actions.FETCH_SUCCESS,
       moduleName,
-      data: fake,
+      source,
+      data: fakeSN,
       networkStat: buildNetworkStat(StatusCodeOK, 100),
     });
     return;
@@ -40,15 +42,17 @@ const fetchAPI = (store: any) => (next: any) => (action: IFetchAPIAction): void 
           store.dispatch({
             type: actions.FETCH_FAILURE,
             moduleName,
+            source,
             error: 'Unknown error while retreiving JSONP',
             networkStat: buildNetworkStat(StatusCodeInternalError, resp.elapsedMs),
-          })
+          });
         } else {
-        Promise.all([resp.json(), resp.elapsedMs])
-          .then((values: Array<any>) => {
+        Promise.all([ resp.json(), resp.elapsedMs ])
+          .then((values: any[]) => {
             store.dispatch({
               type: actions.FETCH_SUCCESS,
               moduleName,
+              source,
               data: values[0],
               networkStat: buildNetworkStat(StatusCodeOK, values[1]),
             });
@@ -82,10 +86,41 @@ const fetchAPI = (store: any) => (next: any) => (action: IFetchAPIAction): void 
           }
         }
       });
+  } else {
+    const start = Date.now();
+    fetch(url, { mode: 'cors' })  // TODO disable
+      .then((resp: any) => {
+        if (!resp.ok) {
+          store.dispatch({
+            type: actions.FETCH_FAILURE,
+            moduleName,
+            source,
+            error: 'Unknown error while fetching JSON',
+            networkStat: buildNetworkStat(StatusCodeInternalError, Date.now() - start),
+          });
+        } else {
+          resp.json().then(data => {
+            store.dispatch({
+              type: actions.FETCH_SUCCESS,
+              moduleName,
+              source,
+              data,
+              networkStat: buildNetworkStat(StatusCodeOK, Date.now() - start),
+            });
+          });
+        }
+      })
+      .catch(err => {
+        store.dispatch({
+          type: actions.FETCH_FAILURE,
+          moduleName,
+          source,
+          error: 'Error connecting to URL',
+          networkStat: buildNetworkStat(StatusCodeInternalError, Date.now() - start),
+        });
+      });
   }
-
-  // TODO non-JSONP
-}
+};
 
 export default {
   fetchAPI,

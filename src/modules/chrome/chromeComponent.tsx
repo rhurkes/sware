@@ -1,12 +1,12 @@
 import * as React from 'react';
 import Appbar from '../../shared-components/appbar';
 import SidebarComponent from './sidebarComponent';
-import { RouteMapping } from '../../pages/routes';
+import { IRouteMapping } from '../../pages/routes';
 
 interface IChromeProps {
   children: any;
   location: any;
-  routeMappings: Array<RouteMapping>;
+  routeMappings: IRouteMapping[];
   sidebarOpen: boolean;
   toggleSidebarOpen: (open?: boolean) => void;
 }
