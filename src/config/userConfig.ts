@@ -8,46 +8,46 @@ const appConfig = {};
 
 const goes16Config = {
   fetching: {
-    value: true,
+    __value: true,
   },
   region: {
-    value: 'cenplains',
-    __options: ['cenplains', 'meso'],
+    __value: 'cenplains',
+    __options: [ 'cenplains', 'meso' ],
     __subtextfunc: x => codModels.goes16Regions[x],
   },
   band: {
-    value: '02',
-    __options: ['02', '04', '05', '09', '13'],
+    __value: '02',
+    __options: [ '02', '04', '05', '09', '13' ],
     __subtextfunc: x => codModels.goes16Bands[x],
   },
   frames: {
-    value: 12,
-    __options: [6, 12, 24, 36],
+    __value: 12,
+    __options: [ 6, 12, 24, 36 ],
     __subtext: 'Number of images to backfill for animation',
-  }
+  },
 };
 
 const eventsConfig = {
   fetching: {
-    value: false,
+    __value: false,
     __order: 0,
   },
   severeMode: {
-    value: false,
+    __value: false,
     __subtext: 'Only displays select products relevant to severe weather.',
     __order: 1,
   },
   hideNonIssued: {
-    value: true,
+    __value: true,
     __text: 'Hide Non-issued',
     __subtext: 'Hides continues/expires/cancels events',
     __order: 2,
   },
   /*showSpotterNetworkReports: {
-    value: true,
+    __value: true,
   },*/
   age: {
-    value: 0,
+    __value: 0,
     __subtextfunc: x => x === 0 ? 'Do not filter by age' : `Showing events from last ${x} minutes`,
     __options: [ 0, 15, 30, 45, 60, 90, 120, 180 ],
     __order: 3,
@@ -56,38 +56,38 @@ const eventsConfig = {
     __order: 4,
     children: {
       outlooks: {
-        value: true,
+        __value: true,
       },
       mesoscaleDiscussions: {
-        value: true,
+        __value: true,
       },
       watches: {
-        value: true,
+        __value: true,
       },
       tornadoWarning: {
-        value: true,
+        __value: true,
       },
       tornadoReports: {
-        value: true,
+        __value: true,
       },
       tornadoEmergencies: {
-        value: true,
+        __value: true,
       },
       hailSize: {
-        value: 2,
+        __value: 2,
         __subtextfunc: x => x === 0 ? 'Do not alert by size' : `Alerts for hail reports of ${x}" and larger`,
         __options: [ 0, 1, 2, 3, 4 ],
       },
-    }
+    },
   },
   showAllCWAs: {
-    value: true,
+    __value: true,
     __text: 'Show all CWAs',
     __subtextfunc: (x, y) => {
       return x
         ? ''
         : `Showing: ${Object.keys(y.cwas.children)
-            .filter(z => y.cwas.children[z].value)
+            .filter(z => y.cwas.children[z].__value)
             .map(z => z.toUpperCase())
             .join(', ')}`;
     },
@@ -104,7 +104,7 @@ const eventsConfig = {
 const sortedCWAs = Object.keys(cwas).sort((a, b) => cwas[a].st.localeCompare(cwas[b].st));
 sortedCWAs.forEach(cwa => {
   eventsConfig.cwas.children[cwa] = {
-    value: false,
+    __value: false,
     __text: cwa.toUpperCase(),
     __subtext: `${cwas[cwa].name}, ${cwas[cwa].st}`,
   };

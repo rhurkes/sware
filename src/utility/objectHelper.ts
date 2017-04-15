@@ -20,19 +20,25 @@ function getReference(target: any, path: string) {
       reference = reference[lookupParts.pop()];
     }
   }
-  
+
   return reference;
 }
 
-function getFromPath(target: any, key: string, path: string) {
+function getFromPath(target: any, path: string) {
+  const splitPath = path.split('/');
+  const key = splitPath[splitPath.length - 1];
   const reference = getReference(target, path);
+
   return reference[key];
 }
 
-function setFromPath(target: any, key: string, path: string, value: string | number | boolean) {
+function setFromPath(target: any, path: string, value: string | number | boolean) {
+  const splitPath = path.split('/');
+  const key = splitPath[splitPath.length - 1];
   const newTarget = Object.assign({}, target);
   const reference = getReference(newTarget, path);
   reference[key] = value;
+
   return newTarget;
 }
 

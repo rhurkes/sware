@@ -49,10 +49,13 @@ function decorateConfig(config, parentPath = '') {
     }
 
     // Only recurse for items that don't have a value. Items with a value should be the end of the branch.
-    if (typeof configItem.value === 'undefined') {
+    if (typeof configItem.__value === 'undefined') {
       decorateConfig(configItem, path);
     }
   });
+
+  config.get = path => objectHelper.getFromPath(config, path);
+  config.set = (path, value) => objectHelper.setFromPath(config, path, value);
 
   return config;
 }

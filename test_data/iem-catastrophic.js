@@ -1,0 +1,1 @@
+"<body xmlns='http://www.w3.org/1999/xhtml'><p>FFC <a href='https://mesonet.agron.iastate.edu/vtec/f/2017-O-NEW-KFFC-TO-W-0041'>issues Tornado Warning</a> [tornado: OBSERVED, tornado damage threat: CATASTROPHIC, hail: 1.50 IN] for Sumter [GA] till 1:45 PM EDT </p></body>"

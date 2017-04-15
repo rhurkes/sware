@@ -11,23 +11,15 @@ events out of order amongst themselves, also amongst other events
 
 
 THIS RELEASE
-[X] REFACTOR: create eventsProcessor component that loads on init
-[X] FEATURE: Enhanced text-to-speech for events to provide more information
-[X] FEATURE: tornado warning source, ie. RADAR INDICATED
-[X] BUG: entire menu item isn't clickable
-[X] BUG: SPC outlooks should be marked important
-[X] BUG: Tornado watch bar should be red
-[X] BUG: EAS not happening more than once per session
-[X] DEV: Setup TSLint and lint everything
-
-
-NEXT RELEASE
+[ ] BUG: not spelling out WFOs
+[ ] DEV: make speech engine able to handle the text passed to it
 [ ] EPIC: Move IEM to sigtor
 [.] FEATURE: include SpotterNetwork events
 [ ] BUG: alerts not sounding until tab has focus
 [.] FEATURE: goes16 plugin
 [ ] FEATURE: add Home config, including geolocation toggle
 [ ] DEV: cleanup middleware, make like coreClient
+[ ] New tornado emergency regex - see IEM catastrophic sample
 
 
 INFRASTRUCTURE
