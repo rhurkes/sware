@@ -11,7 +11,7 @@
 
 $line-height: 16px;
 $line-2-height: 32px;
-$line-3-height: 48px;
+$line-3-height: 56px;
 
 body, button {
     font-family: 'Roboto', sans-serif;
@@ -200,7 +200,7 @@ header {
     padding: 16px;
     margin-top: $line-3-height;
     height: calc(100vh - 88px);
-    overflow: scroll;
+    overflow-y: auto;
 }
 
 #modules {

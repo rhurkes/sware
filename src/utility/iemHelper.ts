@@ -63,7 +63,7 @@ function parseHTML(html: string): any {
  */
 function condenseSPCOutlooks(incomingEvents: any[]): any[] {
   const dayRegex = /The Storm Prediction Center issues Day (.)/i;
-  const riskRegex = /Convective (.+) Risk for portions of (.+)'s area/i;
+  const riskRegex = / (.+) Convective Risk (.+?) for portions of (.+)'s area/i;
 
   // Levels of SPC convective risk. Must be ranked from lowest to highest risk.
   const ptsSummary = [
@@ -84,13 +84,13 @@ function condenseSPCOutlooks(incomingEvents: any[]): any[] {
     const dayMatch = dayRegex.exec(x.details.text);
     dayText = dayMatch && dayMatch[1] ? `Day ${dayMatch[1]}` : '';
     firstIndex = typeof firstIndex === 'undefined' ? index : firstIndex;
-    const result = riskRegex.exec(x.details.text);
+    const result = riskRegex.exec(x.details.text.replace(dayMatch[0], ''));
 
-    if (!result || result.length !== 3) { return; }
+    if (!result || result.length !== 4) { return; }
     const riskKey = textHelper.capitalize(result[1]);
     const summaryItem = ptsSummary.find(x => x.risk === riskKey);
     if (summaryItem && Array.isArray(summaryItem.cwas)) {
-      summaryItem.cwas.push(result[2]);
+      summaryItem.cwas.push(result[3]);
     }
   });
 

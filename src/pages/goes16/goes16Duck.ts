@@ -37,7 +37,7 @@ const initialState = {
 export const reducer = (state = initialState, action: any) => {
   switch (action.type) {
     case actions.UPDATE_GOES16_USER_CONFIG: {
-      const userConfig = objectHelper.setFromPath(state.userConfig, action.key, action.path, action.value);
+      const userConfig = objectHelper.setFromPath(state.userConfig, action.path, action.value);
       configHelper.saveUserConfig(moduleName, userConfig);
 
       return { ...state, userConfig };

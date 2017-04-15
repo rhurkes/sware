@@ -120,7 +120,7 @@ export const reducer = (state = initialState, action: any) => {
       }
     }
     case actions.UPDATE_EVENTS_USER_CONFIG: {
-      const userConfig = objectHelper.setFromPath(state.userConfig, action.key, action.path, action.value);
+      const userConfig = objectHelper.setFromPath(state.userConfig, action.path, action.value);
       configHelper.saveUserConfig(moduleName, userConfig);
 
       // Updating the fetching status should not trigger a filter-only action

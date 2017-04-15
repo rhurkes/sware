@@ -4,7 +4,7 @@ import {
   IFetchAPIAction,
   INetworkStat,
 } from '../middleware/fetchMiddlewareModel';
-import fake from '../../test_data/iem-tor-warning';
+import fake from '../../test_data/iem-outlook-error';
 import fakeSN from '../../test_data/sn-hail-no-size';
 
 const useFakeData = false;
@@ -24,7 +24,7 @@ const fetchAPI = (store: any) => (next: any) => (action: IFetchAPIAction): void 
   if (!action.meta || !action.meta.url) { return next(action); }
   const { url, isJSONP, moduleName, polling, source } = action.meta;
 
-  if (useFakeData) {
+  /*if (useFakeData) {
     store.dispatch({
       type: actions.FETCH_SUCCESS,
       moduleName,
@@ -33,12 +33,20 @@ const fetchAPI = (store: any) => (next: any) => (action: IFetchAPIAction): void 
       networkStat: buildNetworkStat(StatusCodeOK, 100),
     });
     return;
-  }
+  }*/
 
   if (isJSONP) {
     fetchJSONP(url)
       .then((resp: any) => {
-        if (!resp.ok) {
+        if (useFakeData) {
+          store.dispatch({
+            type: actions.FETCH_SUCCESS,
+            moduleName,
+            source,
+            data: fake,
+            networkStat: buildNetworkStat(StatusCodeOK, 100),
+          });
+        } else if (!resp.ok) {
           store.dispatch({
             type: actions.FETCH_FAILURE,
             moduleName,

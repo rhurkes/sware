@@ -207,7 +207,7 @@ select {
   #sidebar.open {
     left: 0; }
   #sidebar #sidebar-logo {
-    height: 48px;
+    height: 56px;
     border-bottom: 1px solid #323232;
     display: flex;
     justify-content: center;
@@ -270,7 +270,7 @@ header {
   display: flex;
   justify-content: space-between;
   background-color: #323232;
-  height: 48px;
+  height: 56px;
   width: 100%;
   padding: 0 16px;
   position: fixed;
@@ -306,9 +306,9 @@ header {
 
 .page {
   padding: 16px;
-  margin-top: 48px;
+  margin-top: 56px;
   height: calc(100vh - 88px);
-  overflow: scroll; }
+  overflow-y: auto; }
 
 #modules {
   display: flex; }
