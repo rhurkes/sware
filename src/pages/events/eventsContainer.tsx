@@ -8,9 +8,10 @@ import { triggerIyaProcessing } from '../../modules/app/appDuck';
 
 const mapStateToProps = (state: any) => {
   const userConfig = getEventsUserConfig(state);
+
   return ({
     userConfig,
-    fetching: userConfig.fetching.value,
+    fetching: userConfig.get('fetching'),
     filteredEvents: getFilteredEvents(state),
     filteredNewEvents: getFilteredNewEvents(state),
     requiresFilterEvents: getRequiresFilterEvents(state),

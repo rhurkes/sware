@@ -51,7 +51,7 @@ class GOES16Component extends React.Component<any, {}> {
 
     // fetchingTimer check is important to prevent this from firing every time you change routes
     if (fetching && !fetchingTimer) {
-      fetchImageData(userConfig.region.value, userConfig.band.value);
+      fetchImageData(userConfig.get('region'), userConfig.get('band'));
     }
   }
 

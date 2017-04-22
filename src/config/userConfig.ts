@@ -43,9 +43,6 @@ const eventsConfig = {
     __subtext: 'Hides continues/expires/cancels events',
     __order: 2,
   },
-  /*showSpotterNetworkReports: {
-    __value: true,
-  },*/
   age: {
     __value: 0,
     __subtextfunc: x => x === 0 ? 'Do not filter by age' : `Showing events from last ${x} minutes`,
@@ -114,5 +111,5 @@ export default {
   [Modules.App]: appConfig,
   [Modules.Events]: eventsConfig,
   [Modules.GOES16]: goes16Config,
-  version: 1,
+  version: 2,
 };

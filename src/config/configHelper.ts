@@ -54,8 +54,12 @@ function decorateConfig(config, parentPath = '') {
     }
   });
 
-  config.get = path => objectHelper.getFromPath(config, path);
-  config.set = (path, value) => objectHelper.setFromPath(config, path, value);
+  // Only add getter/setter on the main config
+  if (!parentPath) {
+    config.get = path => objectHelper.getValueFromPath(config, path.concat('|__value'));
+    config.set = (path, value) => objectHelper.setValueFromPath(
+      config, path.concat('|__value'), value);
+  }
 
   return config;
 }

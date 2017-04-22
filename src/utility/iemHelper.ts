@@ -178,7 +178,7 @@ function addMetaCodes(details, userConfig) {
         if (matches.length > 4) {
           if (matchPattern === regexPatterns.LSRHailReport) {
             const magnitude = parseFloat(matches[4]);
-            if (magnitude >= userConfig.alerts.children.hailSize.value) {
+            if (magnitude >= userConfig.get('alerts|children|hailSize')) {
               details.alertTextValues = [ textValues[0], textValues[1].replace('reports', `reports ${magnitude} inch`) ];
               details.important = true;
               details.metaCode = metaCode.HailReport;
@@ -211,8 +211,8 @@ function addMetaCodes(details, userConfig) {
 
   const lsrTorMatch = 'reports TORNADO';
   const lsrHailMatch = 'reports HAIL';
-  const shouldCheckLSRs = userConfig.alerts.children.hailSize.value > 0 &&
-    userConfig.alerts.children.tornadoReports.value;
+  const shouldCheckLSRs = userConfig.get('alerts|children|hailSize') > 0 &&
+    userConfig.get('alerts|children|tornadoReports');
 
   switch (details.code) {
     case NWSProducts.LocalStormReport: {
@@ -281,7 +281,7 @@ function formatEvent(evt: any, userConfig: any): IWxEvent {
 }
 
 function formatSNEvent(evt: any, userConfig: any): IWxEvent {
-  if (!evt || !userConfig.showSpotterNetworkReports.value) { return; }
+  if (!evt || !userConfig.get('showSpotterNetworkReports')) { return; }
 
   try {
     evt.details.code = 'sn';

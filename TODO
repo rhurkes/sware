@@ -3,24 +3,20 @@ temporarily checking in dist files to get around linux build issues
 certain keys are different in every page, so dont bind them in app (ie. arrow keys)
 Audio not firing ended event for ogg file
 
-DEV BUGS:
-wx api restarting, not displaying latest data
-change source to 'sn'
-standardize events
-events out of order amongst themselves, also amongst other events
-
 
 THIS RELEASE
+[ ] FEATURE: goes16 plugin
 [ ] BUG: not spelling out WFOs
 [ ] DEV: make speech engine able to handle the text passed to it
-[ ] EPIC: Move IEM to sigtor
-[.] FEATURE: include SpotterNetwork events
-[ ] BUG: alerts not sounding until tab has focus
-[.] FEATURE: goes16 plugin
-[ ] FEATURE: add Home config, including geolocation toggle
-[ ] DEV: cleanup middleware, make like coreClient
-[ ] New tornado emergency regex - see IEM catastrophic sample
 
+
+NEXT MAJOR RELEASE
+[ ] EPIC: Replace IEM with wx-api
+[ ] FEATURE: include SpotterNetwork events
+[ ] BUG: New tornado emergency regex - see IEM catastrophic sample. Wait until IEM replaced.
+[ ] BUG: wx api restarting, not displaying latest data
+[ ] BUG: standardize events
+[ ] BUG: events out of order amongst themselves, also amongst other events
 
 INFRASTRUCTURE
 Setup cert renewal
@@ -30,11 +26,13 @@ how to send state and any errors back to me?
 
 
 BACKLOG
+BUG: alerts not sounding until tab has focus
+FEATURE: add Home config, including geolocation toggle
+DEV: cleanup middleware, make like coreClient
 FEATURE: reset to default config
 BUG: always show weather images on home screen side by side
 show filtered count and timestamp for new events if all events are filterd
 hook up home active data
-make full li clickable in nav menu
 BUG: Where should I do the alert logic? It's currently checked in iemHelper, but feels like it should be in iyaMiddleware. Then we might have cyclic deps, though.
 some sort of getter/setter for my config objects to make it easier and provide built in null handling
 some sort of touch feedback for config controls

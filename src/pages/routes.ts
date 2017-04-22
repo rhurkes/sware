@@ -21,8 +21,8 @@ export const routeMappings: IRouteMapping[] = [
   { route: '/', title: 'Home', navText: 'Home', navIcon: IconType.Home, showInNav: true },
   { route: '/events', title: 'Events', navText: 'Events', navIcon: IconType.Events, showInNav: true, contextIcon: IconType.Config, contextIconRoute: '/events/config' },
   { route: '/events/config', title: 'Events Config', contextIcon: IconType.Back, contextIconRoute: '/events' },
-  /*{ route: '/goes16', title: 'GOES 16 Images', navIcon: IconType.Satellite, navText: 'GOES 16 Images', showInNav: true, contextIcon: IconType.Config, contextIconRoute: '/goes16/config' },
-  { route: '/goes16/config', title: 'GOES 16 Config', contextIcon: IconType.Back, contextIconRoute: '/goes16' },*/
+  { route: '/goes16', title: 'GOES 16 Images', navIcon: IconType.Satellite, navText: 'GOES 16 Images', showInNav: true, contextIcon: IconType.Config, contextIconRoute: '/goes16/config' },
+  { route: '/goes16/config', title: 'GOES 16 Config', contextIcon: IconType.Back, contextIconRoute: '/goes16' },
 ];
 
 const getTitleFromPath = path => {

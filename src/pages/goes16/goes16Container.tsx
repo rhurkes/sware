@@ -7,13 +7,13 @@ const mapStateToProps = (state: any) => {
   const imageData = getImageData(state);
   let imageURLs = imageData.imageURLs.slice();
   imageURLs.reverse();
-  imageURLs = imageURLs.slice(0, userConfig.frames.value);
+  imageURLs = imageURLs.slice(0, userConfig.get('frames'));
   imageURLs.reverse();
 
   return ({
     userConfig,
     imageURLs,
-    fetching: userConfig.fetching.value,
+    fetching: userConfig.get('fetching'),
   });
 };
 

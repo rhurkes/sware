@@ -23,8 +23,8 @@ export const getEventsUserConfig = state => state[moduleName].userConfig;
 export const updateEventsTimeAgo = eventsUserConfig => ({ type: actions.UPDATE_EVENTS_TIMEAGO, eventsUserConfig });
 export const triggerFilterEvents = eventsUserConfig => ({ type: actions.TRIGGER_FILTER_EVENTS, eventsUserConfig });
 
-export const updateUserConfig = (path: string, value, key: string = 'value') => ({
-  type: actions.UPDATE_EVENTS_USER_CONFIG, path, value, key,
+export const updateUserConfig = (path: string, value) => ({
+  type: actions.UPDATE_EVENTS_USER_CONFIG, path, value,
 });
 
 export const fetchSNEvents = (lastSNSequence: number): IFetchAPIAction => ({
@@ -36,7 +36,7 @@ export const fetchSNEvents = (lastSNSequence: number): IFetchAPIAction => ({
     polling: {
       delay: swareConfig[moduleName].POLLING_INTERVAL_MS,
       timerActionType: actions.POLLING_TIMER_UPDATE,
-      continueCheck: store => store.getState()[moduleName].userConfig.fetching.value,
+      continueCheck: store => store.getState()[moduleName].userConfig.get('fetching'),
       createNextAction: (store, action) => {
         const nextAction = Object.assign({}, action);
         nextAction.meta.url = swareConfig[moduleName].SN_DATA_URL.replace(
@@ -59,7 +59,7 @@ export const fetchEvents = (lastIEMSequence: number): IFetchAPIAction => ({
     polling: {
       delay: swareConfig[moduleName].POLLING_INTERVAL_MS,
       timerActionType: actions.POLLING_TIMER_UPDATE,
-      continueCheck: store => store.getState()[moduleName].userConfig.fetching.value,
+      continueCheck: store => store.getState()[moduleName].userConfig.get('fetching'),
       createNextAction: (store, action) => {
         const nextAction = Object.assign({}, action);
         nextAction.meta.url = swareConfig[moduleName].DATA_URL.replace(
@@ -120,7 +120,7 @@ export const reducer = (state = initialState, action: any) => {
       }
     }
     case actions.UPDATE_EVENTS_USER_CONFIG: {
-      const userConfig = objectHelper.setFromPath(state.userConfig, action.path, action.value);
+      const userConfig = objectHelper.setValueFromPath(state.userConfig, action.path, action.value);
       configHelper.saveUserConfig(moduleName, userConfig);
 
       // Updating the fetching status should not trigger a filter-only action

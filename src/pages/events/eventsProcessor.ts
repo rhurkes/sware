@@ -16,25 +16,25 @@ function filterEvents(events, userConfig) {
 
   try {
     // Filter by age first, since it can quickly filter many events before more complex filters
-    filteredEvents = filterByTime(userConfig.age.value, filteredEvents);
+    filteredEvents = filterByTime(userConfig.get('age'), filteredEvents);
 
     // CWA filter
-    if (!userConfig.showAllCWAs.value) {
+    if (!userConfig.get('showAllCWAs')) {
       filteredEvents = filteredEvents.filter(evt => {
         const cwaSetting = userConfig.cwas.children[evt.details.wfo];
-        return !cwaSetting || cwaSetting.value;
+        return !cwaSetting || cwaSetting.__value;
       });
     }
 
     // Product filter
-    if (userConfig.severeMode.value) {
+    if (userConfig.get('severeMode')) {
       filteredEvents = filteredEvents.filter(evt =>
         evt.source !== EventSource.IEM ||
         swareConfig.events.SEVERE_MODE_PRODUCTS.includes(evt.details.code));
     }
 
     // Non-issued filter
-    if (userConfig.hideNonIssued.value) {
+    if (userConfig.get('hideNonIssued')) {
       filteredEvents = filteredEvents.filter(evt =>
         evt.source !== EventSource.IEM ||
         evt.details.text && !evt.details.text.slice(0, 13).match(nonIssuedRegex));

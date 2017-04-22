@@ -44,7 +44,7 @@ const utterancesConfig = {
 };
 
 // TODO why can't I use modules.events here?
-const config = {
+export default {
   app: appConfig,
   geolocation: geolocationConfig,
   speech: speechConfig,
@@ -54,5 +54,3 @@ const config = {
   events: eventsConfig,
   goes16: goes16Config,
 };
-
-export default config;

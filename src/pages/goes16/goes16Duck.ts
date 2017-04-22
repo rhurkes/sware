@@ -19,7 +19,7 @@ export const fetchImageData = (region: string, band: string): IFetchAPIAction =>
     polling: {
       delay: swareConfig[moduleName].POLLING_INTERVAL_MS,
       timerActionType: actions.POLLING_TIMER_UPDATE,  // Probably need unique data attached to these
-      continueCheck: store => store.getState()[moduleName].userConfig.fetching.value,
+      continueCheck: store => store.getState()[moduleName].userConfig.get('fetching'),
       createNextAction: (store, action) => action,
     },
   },
@@ -37,7 +37,7 @@ const initialState = {
 export const reducer = (state = initialState, action: any) => {
   switch (action.type) {
     case actions.UPDATE_GOES16_USER_CONFIG: {
-      const userConfig = objectHelper.setFromPath(state.userConfig, action.path, action.value);
+      const userConfig = objectHelper.setValueFromPath(state.userConfig, action.path, action.value);
       configHelper.saveUserConfig(moduleName, userConfig);
 
       return { ...state, userConfig };
